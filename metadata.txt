@@ -1,0 +1,18 @@
+# This file contains metadata for the plugin.
+# See https://docs.qgis.org/latest/en/docs/pyqgis_developer_cookbook/plugins/plugins.html#plugin-metadata
+
+[general]
+name=Carregador GTFS
+description=Carrega shapes e paradas de um arquivo ZIP do GTFS como camadas vetoriais.
+about=A plugin to easily visualize GTFS data in QGIS. It reads shapes.txt and stops.txt from a zip file and creates styled vector layers.
+version=0.1
+qgisMinimumVersion=3.0
+author=Antigravity
+email=antigravity@example.com
+repository=https://github.com/example/qgis-gtfs-loader
+
+category=Plugins
+tags=GTFS, transport, shape, stop, zip
+icon=icon.png
+experimental=True
+deprecated=False

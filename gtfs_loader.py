@@ -86,6 +86,26 @@ class GTFSLoader:
                             'color': row.get('route_color', '000000')
                         }
 
+            # 1.5 Parse Fares
+            fares = {}
+            if 'fare_attributes.txt' in files:
+                with z.open('fare_attributes.txt') as f:
+                    reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                    for row in reader:
+                        fares[row['fare_id']] = row.get('price', '0.00')
+
+            route_to_price = {}
+            if 'fare_rules.txt' in files:
+                with z.open('fare_rules.txt') as f:
+                    reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                    for row in reader:
+                        rid = row['route_id']
+                        fid = row['fare_id']
+                        if fid in fares:
+                            # Just take the first price found for a route for simplicity
+                            if rid not in route_to_price:
+                                route_to_price[rid] = fares[fid]
+
             # 2. Parse Trips
             trips = []
             if 'trips.txt' in files:
@@ -135,10 +155,10 @@ class GTFSLoader:
                         })
 
             # Create Layers
-            self.create_shape_layer(trips, shapes, routes, agencies)
+            self.create_shape_layer(trips, shapes, routes, agencies, route_to_price)
             self.create_stop_layer(stops)
 
-    def create_shape_layer(self, trips, shapes, routes, agencies):
+    def create_shape_layer(self, trips, shapes, routes, agencies, route_to_price):
         if not shapes:
             return
 
@@ -164,6 +184,7 @@ class GTFSLoader:
             QgsField("destino", QtCore.QVariant.String),
             QgsField("sentido", QtCore.QVariant.String),
             QgsField("transit_type", QtCore.QVariant.String),
+            QgsField("tarifa", QtCore.QVariant.String),
             QgsField("color", QtCore.QVariant.String)
         ])
         layer.updateFields()
@@ -211,6 +232,7 @@ class GTFSLoader:
                 trip_name,
                 trip['direction'],
                 transit_type,
+                route_to_price.get(route_id, ''),
                 color
             ])
             features.append(feat)

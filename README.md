@@ -15,12 +15,13 @@ Plugin para QGIS focado na visualização técnica de redes de transporte a part
 
 ## 🛠 Instalação
 
-Copie a pasta `Carregador_GTFS` para o diretório de plugins do QGIS de acordo com seu sistema:
-- **Windows**: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
-- **Linux**: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/`
-- **macOS**: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`
+1. Garanta que todos os arquivos do plugin estejam dentro de uma pasta chamada **`Carregador_GTFS`**.
+2. Copie essa pasta para o diretório de plugins do QGIS de acordo com seu sistema:
+   - **Windows**: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
+   - **Linux**: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/`
+   - **macOS**: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`
 
-Após copiar, reinicie o QGIS e ative em **Complementos** -> **Gerenciar e Instalar Complementos**.
+3. Reinicie o QGIS e ative em **Complementos** -> **Gerenciar e Instalar Complementos**.
 
 ## 📖 Uso
 

@@ -1,34 +1,37 @@
 # Carregador GTFS
 
-Plugin para QGIS que permite carregar linhas e paradas a partir de um arquivo ZIP de GTFS, com foco em visualização limpa e dados enriquecidos.
+Plugin para QGIS focado na visualização técnica de redes de transporte a partir de arquivos ZIP de GTFS.
 
-## 🚀 Funcionalidades
+## 🚀 Funcionalidades Principais
 
-- **Leitura Direta de ZIP**: Processa `shapes.txt`, `stops.txt`, `trips.txt`, `routes.txt`, `agency.txt`, `fare_attributes.txt` e `fare_rules.txt`.
-- **Geometria Otimizada**: Agrupa dados por `shape_id` para evitar excesso de linhas sobrepostas.
-- **Dados de Tarifas**: Inclui o preço da tarifa diretamente nos atributos das linhas.
-- **Linhas por Parada**: Identifica e lista quais linhas atendem cada ponto de parada.
-- **Estilização Automática**: Aplica as cores das rotas e permite configuração de rótulos.
-- **Atributos em Português**: Campos como `linha`, `nome`, `operador`, `destino`, `sentido`, `tarifa` e `plataforma`.
+- **Shapes Otimizados**: Agrupa viagens por `shape_id` para evitar centenas de linhas sobrepostas.
+- **Inteligência de Paradas**: 
+    - Lista todas as linhas que passam no ponto (`linhas`).
+    - Identifica se o ponto é terminal (**ponto final**) de alguma linha.
+    - Lista quais linhas terminam naquele local (`linhas_pf`).
+- **Dados Financeiros**: Extrai preços de tarifa (`tarifa`) vinculados às rotas.
+- **Interface Localizada**: Atributos em português (`linha`, `operador`, `destino`, `sentido`, `plataforma`, etc.).
+- **Estilização Automática**: Aplica as cores oficiais das rotas e permite configuração de rótulos.
 
 ## 🛠 Instalação
 
-1. Baixe os arquivos do plugin.
-2. Copie a pasta `Carregador_GTFS` para o diretório de plugins do QGIS:
-   - **Windows**: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
-3. Reinicie o QGIS.
-4. Ative o plugin em **Complementos** -> **Gerenciar e Instalar Complementos**.
+Copie a pasta `Carregador_GTFS` para o diretório de plugins do QGIS de acordo com seu sistema:
+- **Windows**: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
+- **Linux**: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/`
+- **macOS**: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`
 
-## 📖 Como Usar
+Após copiar, reinicie o QGIS e ative em **Complementos** -> **Gerenciar e Instalar Complementos**.
 
-1. Acesse **Complementos** -> **Carregar Shapes & Paradas GTFS**.
-2. Selecione o arquivo ZIP do seu GTFS.
-3. O plugin gerará as camadas "Linhas" e "Paradas" automaticamente.
+## 📖 Uso
 
-## ⚙ Configuração
+1. Use o menu **Complementos** -> **Carregar Shapes & Paradas GTFS**.
+2. Selecione o ZIP do GTFS.
+3. As camadas "Linhas" e "Paradas" serão criadas com todos os metadados.
 
-Caso queira habilitar ou desabilitar os **rótulos automáticos**, edite o arquivo `gtfs_loader.py` e procure pelos comentários explicativos nas linhas **287** e **355**.
+## ⚙ Configuração de Rótulos
+
+Os rótulos vêm desabilitados por padrão para manter o mapa limpo. Para habilitar, edite `gtfs_loader.py` e descomente as linhas indicadas com o comentário `# PARA DESATIVAR RÓTULOS...` (linhas **287** e **355**).
 
 ## ⚖ Licença
 
-Este projeto está licenciado sob a [GNU GPL v3](LICENSE).
+GNU GPL v3.

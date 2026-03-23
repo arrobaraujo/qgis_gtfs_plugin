@@ -157,6 +157,7 @@ class GTFSLoader:
 
             # 3. Parse Stop Times (to relate stops to routes)
             stop_to_routes = {}
+            trip_last_stop = {} # trip_id -> (stop_id, sequence)
             trip_to_route = {t['trip_id']: t['route_id'] for t in trips}
             
             if 'stop_times.txt' in files:
@@ -165,15 +166,31 @@ class GTFSLoader:
                     for row in reader:
                         tid = row['trip_id']
                         sid = row['stop_id']
+                        seq = int(row.get('stop_sequence', '0'))
+                        
+                        # General association
                         rid = trip_to_route.get(tid)
                         if rid:
                             if sid not in stop_to_routes:
                                 stop_to_routes[sid] = set()
                             stop_to_routes[sid].add(rid)
+                            
+                            # Terminal detection
+                            if tid not in trip_last_stop or seq > trip_last_stop[tid][1]:
+                                trip_last_stop[tid] = (sid, seq)
+
+            # Map terminals back to stops
+            stop_to_pf_routes = {}
+            for tid, (sid, seq) in trip_last_stop.items():
+                rid = trip_to_route.get(tid)
+                if rid:
+                    if sid not in stop_to_pf_routes:
+                        stop_to_pf_routes[sid] = set()
+                    stop_to_pf_routes[sid].add(rid)
 
             # Create Layers
             self.create_shape_layer(trips, shapes, routes, agencies, route_to_price)
-            self.create_stop_layer(stops, stop_to_routes, routes)
+            self.create_stop_layer(stops, stop_to_routes, stop_to_pf_routes, routes)
 
     def create_shape_layer(self, trips, shapes, routes, agencies, route_to_price):
         if not shapes:
@@ -290,7 +307,7 @@ class GTFSLoader:
         # Add to project
         QgsProject.instance().addMapLayer(layer)
 
-    def create_stop_layer(self, stops, stop_to_routes, routes):
+    def create_stop_layer(self, stops, stop_to_routes, stop_to_pf_routes, routes):
         if not stops:
             return
 
@@ -305,6 +322,8 @@ class GTFSLoader:
             QgsField("stop_code", QtCore.QVariant.String),
             QgsField("plataforma", QtCore.QVariant.String),
             QgsField("linhas", QtCore.QVariant.String),
+            QgsField("ponto_final", QtCore.QVariant.String),
+            QgsField("linhas_pf", QtCore.QVariant.String),
             QgsField("stop_desc", QtCore.QVariant.String),
             QgsField("lat", QtCore.QVariant.Double),
             QgsField("lon", QtCore.QVariant.Double)
@@ -316,7 +335,7 @@ class GTFSLoader:
             feat = QgsFeature()
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(s['lon'], s['lat'])))
             
-            # Get unique route names for this stop
+            # Get unique route names for this stop (General)
             route_ids = stop_to_routes.get(stop_id, [])
             route_names = []
             for rid in route_ids:
@@ -324,8 +343,18 @@ class GTFSLoader:
                 name = rinfo.get('short_name') or rinfo.get('long_name') or rid
                 route_names.append(name)
             
-            # Sort and join
             route_names_str = ", ".join(sorted(list(set(route_names))))
+
+            # Get unique route names for this stop (Terminal)
+            pf_route_ids = stop_to_pf_routes.get(stop_id, [])
+            pf_route_names = []
+            for rid in pf_route_ids:
+                rinfo = routes.get(rid, {})
+                name = rinfo.get('short_name') or rinfo.get('long_name') or rid
+                pf_route_names.append(name)
+            
+            pf_route_names_str = ", ".join(sorted(list(set(pf_route_names))))
+            is_pf = "sim" if pf_route_names_str else ""
 
             feat.setAttributes([
                 stop_id, 
@@ -333,8 +362,10 @@ class GTFSLoader:
                 s['location_type'], 
                 s['parent_station'],
                 s['stop_code'],
-                s['platform_code'],
+                s['plataforma'] if 'plataforma' in s else s.get('platform_code', ''),
                 route_names_str,
+                is_pf,
+                pf_route_names_str,
                 s['stop_desc'],
                 s['lat'], 
                 s['lon']

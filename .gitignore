@@ -6,12 +6,40 @@ __pycache__/
 # OS generated files
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# QGIS / IDE specific
+# QGIS specific
 *.qgs~
 *.qgs
+*.qgz
+*.qm
+*.bak
+
+# IDE specific
 .idea/
 .vscode/
+*.swp
+*.swo
+*~
 
-# ZIP archives (input data)
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build and Distribution
+build/
+dist/
+*.egg-info/
+
+# Python Tools/Caches
+.mypy_cache/
+.pytest_cache/
+.tox/
+.coverage
+htmlcov/
+
+# Local Environment / Zip archives
+.env
 *.zip

@@ -15,6 +15,7 @@ from qgis.core import (
     QgsPalLayerSettings,
     QgsVectorLayerSimpleLabeling,
     QgsTextFormat,
+    QgsTextBufferSettings,
     QgsFields,
     QgsSymbol,
     QgsSymbolLayer,
@@ -137,14 +138,14 @@ class GTFSLoader:
                         })
 
             # 4. Parse Stops
-            stops = []
+            stops = {}
             if 'stops.txt' in files:
                 with z.open('stops.txt') as f:
                     reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
                     for row in reader:
-                        stops.append({
-                            'id': row['stop_id'],
-                            'name': row.get('stop_name', row['stop_id']),
+                        stop_id = row['stop_id']
+                        stops[stop_id] = {
+                            'name': row.get('stop_name', stop_id),
                             'lat': float(row['stop_lat']),
                             'lon': float(row['stop_lon']),
                             'location_type': row.get('location_type', '0'),
@@ -152,11 +153,27 @@ class GTFSLoader:
                             'stop_code': row.get('stop_code', ''),
                             'platform_code': row.get('platform_code', ''),
                             'stop_desc': row.get('stop_desc', '')
-                        })
+                        }
+
+            # 3. Parse Stop Times (to relate stops to routes)
+            stop_to_routes = {}
+            trip_to_route = {t['trip_id']: t['route_id'] for t in trips}
+            
+            if 'stop_times.txt' in files:
+                with z.open('stop_times.txt') as f:
+                    reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                    for row in reader:
+                        tid = row['trip_id']
+                        sid = row['stop_id']
+                        rid = trip_to_route.get(tid)
+                        if rid:
+                            if sid not in stop_to_routes:
+                                stop_to_routes[sid] = set()
+                            stop_to_routes[sid].add(rid)
 
             # Create Layers
             self.create_shape_layer(trips, shapes, routes, agencies, route_to_price)
-            self.create_stop_layer(stops)
+            self.create_stop_layer(stops, stop_to_routes, routes)
 
     def create_shape_layer(self, trips, shapes, routes, agencies, route_to_price):
         if not shapes:
@@ -170,7 +187,7 @@ class GTFSLoader:
                 shape_to_trip[sid] = t
 
         # Create memory layer
-        layer = QgsVectorLayer("LineString?crs=epsg:4326", "GTFS Shapes", "memory")
+        layer = QgsVectorLayer("LineString?crs=epsg:4326", "Linhas", "memory")
         pr = layer.dataProvider()
         
         # Add attributes
@@ -247,14 +264,37 @@ class GTFSLoader:
                 sl = symbol.symbolLayer(i)
                 sl.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("color"))
         
+        # Labeling for Lines
+        label_settings = QgsPalLayerSettings()
+        label_settings.fieldName = "linha"
+        label_settings.placement = QgsPalLayerSettings.Line
+        
+        text_format = QgsTextFormat()
+        text_format.setSize(8)
+        text_format.setColor(QtGui.QColor(0, 0, 0))
+        
+        # Add a white halo (buffer) for readability
+        buffer_settings = QgsTextBufferSettings()
+        buffer_settings.setEnabled(True)
+        buffer_settings.setSize(1)
+        buffer_settings.setColor(QtGui.QColor(255, 255, 255))
+        text_format.setBuffer(buffer_settings)
+        
+        label_settings.setFormat(text_format)
+        
+        # Enable labeling
+        layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
+        # PARA DESATIVAR RÓTULOS NESTA CAMADA, COMENTE A LINHA ABAIXO (coloque um # no início)
+        #layer.setLabelsEnabled(True)
+        
         # Add to project
         QgsProject.instance().addMapLayer(layer)
 
-    def create_stop_layer(self, stops):
+    def create_stop_layer(self, stops, stop_to_routes, routes):
         if not stops:
             return
 
-        layer = QgsVectorLayer("Point?crs=epsg:4326", "GTFS Stops", "memory")
+        layer = QgsVectorLayer("Point?crs=epsg:4326", "Paradas", "memory")
         pr = layer.dataProvider()
         
         pr.addAttributes([
@@ -264,6 +304,7 @@ class GTFSLoader:
             QgsField("parent_station", QtCore.QVariant.String),
             QgsField("stop_code", QtCore.QVariant.String),
             QgsField("plataforma", QtCore.QVariant.String),
+            QgsField("linhas", QtCore.QVariant.String),
             QgsField("stop_desc", QtCore.QVariant.String),
             QgsField("lat", QtCore.QVariant.Double),
             QgsField("lon", QtCore.QVariant.Double)
@@ -271,18 +312,31 @@ class GTFSLoader:
         layer.updateFields()
 
         features = []
-        for s in stops:
+        for stop_id, s in stops.items():
             feat = QgsFeature()
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(s['lon'], s['lat'])))
+            
+            # Get unique route names for this stop
+            route_ids = stop_to_routes.get(stop_id, [])
+            route_names = []
+            for rid in route_ids:
+                rinfo = routes.get(rid, {})
+                name = rinfo.get('short_name') or rinfo.get('long_name') or rid
+                route_names.append(name)
+            
+            # Sort and join
+            route_names_str = ", ".join(sorted(list(set(route_names))))
+
             feat.setAttributes([
-                s['id'], 
+                stop_id, 
                 s['name'], 
                 s['location_type'], 
                 s['parent_station'],
                 s['stop_code'],
                 s['platform_code'],
+                route_names_str,
                 s['stop_desc'],
-                s['lat'],
+                s['lat'], 
                 s['lon']
             ])
             features.append(feat)
@@ -297,6 +351,7 @@ class GTFSLoader:
         text_format.setSize(8)
         label_settings.setFormat(text_format)
         layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
-        layer.setLabelsEnabled(True)
+        # PARA DESATIVAR RÓTULOS NESTA CAMADA, COMENTE A LINHA ABAIXO (coloque um # no início)
+        #layer.setLabelsEnabled(True)
 
         QgsProject.instance().addMapLayer(layer)

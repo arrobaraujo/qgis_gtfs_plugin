@@ -4,14 +4,14 @@
  <widget class="QDialog" name="GTFSLoaderDialogBase">
   <property name="geometry">
    <rect>
-    <x>0</x>
+    <x>0</    x>
     <y>0</y>
     <width>400</width>
     <height>150</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Carregador GTFS</string>
+   <string>GTFS 2 GIS</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

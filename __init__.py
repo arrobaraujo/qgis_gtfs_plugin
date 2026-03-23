@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 
 def classFactory(iface):
-    from .gtfs_loader import GTFSLoader
+    from .plugin import GTFSLoader
     return GTFSLoader(iface)

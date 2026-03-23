@@ -1,38 +1,38 @@
-# Carregador GTFS
+# GTFS 2 GIS
 
-Plugin para QGIS focado na visualização técnica de redes de transporte a partir de arquivos ZIP de GTFS.
+QGIS plugin focused on the technical visualization of transport networks from GTFS ZIP files.
 
-## 🚀 Funcionalidades Principais
+## 🚀 Key Features
 
-- **Shapes Otimizados**: Agrupa viagens por `shape_id` para evitar centenas de linhas sobrepostas.
-- **Inteligência de Paradas**: 
-    - Lista todas as linhas que passam no ponto (`linhas`).
-    - Identifica se o ponto é terminal (**ponto final**) de alguma linha.
-    - Lista quais linhas terminam naquele local (`linhas_pf`).
-- **Dados Financeiros**: Extrai preços de tarifa (`tarifa`) vinculados às rotas.
-- **Interface Localizada**: Atributos em português (`linha`, `operador`, `destino`, `sentido`, `plataforma`, etc.).
-- **Estilização Automática**: Aplica as cores oficiais das rotas e permite configuração de rótulos.
+- **Optimized Shapes**: Groups trips by `shape_id` to avoid hundreds of overlapping lines.
+- **Stop Intelligence**: 
+    - Lists all lines passing through a stop (`lines`).
+    - Identifies if a stop is a terminal (**terminal**) for any line.
+    - Lists which lines terminate at that location (`lines_terminal`).
+- **Financial Data**: Extracts fare prices (`fare`) linked to routes.
+- **Localized Interface**: Attributes now in English (`service`, `line`, `agency`, `destination`, `direction`, `platform`, etc.).
+- **Automatic Styling**: Applies official route colors and allows label configuration.
 
-## 🛠 Instalação
+## 🛠 Installation
 
-1. Garanta que todos os arquivos do plugin estejam dentro de uma pasta chamada **`Carregador_GTFS`**.
-2. Copie essa pasta para o diretório de plugins do QGIS de acordo com seu sistema:
+1. Ensure all plugin files are inside a folder named **`qgis_gtfs_plugin`**.
+2. Copy this folder to the QGIS plugins directory according to your system:
    - **Windows**: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
-   - **Linux**: `~/.local/share/QGIS/QGIS3/profiles/default/python/plugins/`
+   - **Linux**: `~/.local/share/QGIS/QGIS3/profiles\default\python\plugins/`
    - **macOS**: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`
 
-3. Reinicie o QGIS e ative em **Complementos** -> **Gerenciar e Instalar Complementos**.
+3. Restart QGIS and enable it in **Plugins** -> **Manage and Install Plugins**.
 
-## 📖 Uso
+## 📖 Usage
 
-1. Use o menu **Complementos** -> **Carregar Shapes & Paradas GTFS**.
-2. Selecione o ZIP do GTFS.
-3. As camadas "Linhas" e "Paradas" serão criadas com todos os metadados.
+1. Use the menu **Plugins** -> **GTFS 2 GIS** -> **Load GTFS...**.
+2. Select the GTFS ZIP file.
+3. The "Lines" and "Stops" layers will be created with all metadata.
 
-## ⚙ Configuração de Rótulos
+## ⚙ Label Configuration
 
-Os rótulos vêm desabilitados por padrão para manter o mapa limpo. Para habilitar, edite `gtfs_loader.py` e descomente as linhas indicadas com o comentário `# PARA DESATIVAR RÓTULOS...` (linhas **287** e **355**).
+Labels are disabled by default to keep the map clean. To enable them, edit the layer properties in QGIS or modify the `core/layer_factory.py` file.
 
-## ⚖ Licença
+## ⚖ License
 
 GNU GPL v3.

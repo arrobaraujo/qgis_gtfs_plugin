@@ -34,7 +34,7 @@ class GTFSLoader:
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-        self.action = QtWidgets.QAction("Carregar Shapes & Paradas GTFS", self.iface.mainWindow())
+        self.action = QtWidgets.QAction("Escolha o GTFS a ser carregado", self.iface.mainWindow())
         self.action.triggered.connect(self.run)
         self.iface.addPluginToMenu("&Carregador GTFS", self.action)
 

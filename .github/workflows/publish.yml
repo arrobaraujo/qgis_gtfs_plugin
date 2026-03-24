@@ -23,7 +23,7 @@ jobs:
       - name: Release to QGIS Repository
         run: >
           qgis-plugin-ci
-          release ${GITHUB_REF_NAME#v}
+          release ${GITHUB_REF_NAME}
           --osgeo-username ${{ secrets.OSGEO_USER }}
           --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
           --github-token ${{ secrets.GITHUB_TOKEN }}

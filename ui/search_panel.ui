@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GTFSSearchPanel</class>
+ <widget class="QDockWidget" name="GTFSSearchPanel">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>300</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>GTFS Analytics</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QVBoxLayout" name="verticalLayout_main">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_filters">
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Filter Lines (Period):</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="filter_period">
+        <item><property name="text"><string>All Periods</string></property></item>
+        <item><property name="text"><string>Morning Peak</string></property></item>
+        <item><property name="text"><string>Midday</string></property></item>
+        <item><property name="text"><string>Evening Peak</string></property></item>
+        <item><property name="text"><string>Night</string></property></item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_apply">
+        <property name="text">
+         <string>Apply Filters</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_clear">
+        <property name="text">
+         <string>Clear Filters</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_frequency_heatmap">
+        <property name="text">
+         <string>Generate Frequency Heatmap Layer</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_real_isochrones">
+        <property name="text">
+         <string>Real Isochrones (Network)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="title">
+       <string>Network Stats</string>
+      </property>
+      <layout class="QFormLayout" name="formLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>Total Km/Day:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="val_total_km">
+         <property name="text">
+          <string>0.0 km</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold; color: blue;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Stops Density:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="val_stop_density">
+         <property name="text">
+          <string>0.0 /km²</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Unique Routes:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="val_routes">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Total Trips:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLabel" name="val_trips">
+         <property name="text">
+          <string>0</string>
+         </property>
+       </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Avg. Route Len:</string>
+         </property>
+       </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="val_avg_len">
+         <property name="text">
+          <string>0.0 km</string>
+         </property>
+       </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Agencies:</string>
+         </property>
+       </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="val_agencies">
+         <property name="text">
+          <string>0</string>
+         </property>
+       </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Total Stops:</string>
+         </property>
+       </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLabel" name="val_total_stops">
+         <property name="text">
+          <string>0</string>
+         </property>
+       </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_area">
+         <property name="text">
+          <string>Network Area:</string>
+         </property>
+       </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLabel" name="val_area">
+         <property name="text">
+          <string>0.0 km²</string>
+         </property>
+       </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_13">
+      <property name="text">
+       <string>Trips by Agency:</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QListWidget" name="list_agency_fleet">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>100</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_2">
+      <property name="title">
+       <string>Analysis Tools</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="btn_pop_analysis">
+         <property name="text">
+          <string>Population Coverage Tool...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_desert_finder">
+         <property name="text">
+          <string>Transit Desert Finder...</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <spacer name="verticalSpacer_main">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

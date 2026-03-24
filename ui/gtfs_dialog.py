@@ -27,3 +27,7 @@ class GTFSDialog(QtWidgets.QDialog, FORM_CLASS):
     def get_selected_file(self) -> str:
         """Returns the path to the selected file."""
         return self.gtfs_file_widget.filePath()
+
+    def get_service_day(self) -> str:
+        """Returns the selected service day from the combo box."""
+        return self.serviceDayCombo.currentText()

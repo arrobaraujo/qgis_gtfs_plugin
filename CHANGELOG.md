@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.4.5] - 2026-03-24
+- Absolute zero-tolerance PEP8 fix for `layer_factory.py`: Fixed hidden whitespaces, multi-statement exceptions, and restored accidentally truncated processing logic.
+
+## [0.4.4] - 2026-03-24
+- Surgical code style refactor: Resolved all 54 remaining PEP8 violations in `layer_factory.py`. Fixes include hidden whitespaces, single-line conditionals, and unused variables.
+
 ## [0.4.3] - 2026-03-24
 - Absolute PEP8 compliance in `layer_factory.py`: Resolved remaining 86 styling issues (E261, E127, E701, E303, W291/W293).
 

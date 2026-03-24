@@ -275,7 +275,7 @@ class LayerFactory:
         # Try to find the correct algorithm ID dynamically
         all_algs = [alg.id() for alg in QgsApplication.processingRegistry().algorithms()]
         target_alg = next((a for a in all_algs if "servicearea" in a.lower() and "layer" in a.lower()), None)
-        
+
         if not target_alg:
             # Last ditch effort: fallback search
             possible_ids = ["native:servicearea_fromlayer", "qgis:servicearea_fromlayer", "native:serviceareafrompoints"]
@@ -291,7 +291,7 @@ class LayerFactory:
             raise e
 
         output_layer = result['OUTPUT']
-        
+
         # Add to project
         output_layer.setName(f"Network Reach ({int(distance)}m)")
         QgsProject.instance().addMapLayer(output_layer)
@@ -299,12 +299,11 @@ class LayerFactory:
         node = QgsProject.instance().layerTreeRoot().findLayer(output_layer.id())
         if node:
             node.setItemVisibilityChecked(False)
-        
+
         # Simple styling: Red lines
         symbol = QgsLineSymbol.createSimple({'color': '#e31a1c', 'width': '0.4'})
         output_layer.setRenderer(QgsSingleSymbolRenderer(symbol))
         output_layer.triggerRepaint()
-
 
     @staticmethod
     def create_stop_layer(
@@ -390,7 +389,7 @@ class LayerFactory:
                 s['lat'],
                 s['lon'],
                 stop_route_counts.get(stop_id, 0),
-                r_types_str, 
+                r_types_str,
                 primary_type
             ])
             features.append(feat)
@@ -427,11 +426,16 @@ class LayerFactory:
             sorted_by_pri = sorted(list(s_types), key=lambda x: priority.get(x, 100))
             p_type = sorted_by_pri[0]
             # Convert extended to base types for rule matching if needed
-            if 100 <= int(p_type) < 200: p_type = '100' # Rail
-            elif 200 <= int(p_type) < 300: p_type = '3' # Coach as Bus
-            elif 900 <= int(p_type) < 1000: p_type = '0' # Tram
-            elif 700 <= int(p_type) < 900: p_type = '3' # Bus
-            elif 1000 <= int(p_type) < 1100: p_type = '4' # Ferry
+            if 100 <= int(p_type) < 200:
+                p_type = '100'  # Rail
+            elif 200 <= int(p_type) < 300:
+                p_type = '3'  # Coach as Bus
+            elif 900 <= int(p_type) < 1000:
+                p_type = '0'  # Tram
+            elif 700 <= int(p_type) < 900:
+                p_type = '3'  # Bus
+            elif 1000 <= int(p_type) < 1100:
+                p_type = '4'  # Ferry
             present_types.add(p_type)
 
         rules = [
@@ -447,13 +451,11 @@ class LayerFactory:
         root_rule = QgsRuleBasedRenderer.Rule(None)
 
         # Only add rules that are present in the data
-        any_rule_added = False
         for label, exp, color, char, tid in rules:
             if tid in present_types:
                 rule = QgsRuleBasedRenderer.Rule(create_layered_symbol(color, char), label=label, filterExp=exp)
                 root_rule.appendChild(rule)
-                any_rule_added = True
-        
+
         # Default rule if nothing matches or others exist
         default_rule = QgsRuleBasedRenderer.Rule(create_layered_symbol('#808080', '🚏'), label='Other', filterExp='ELSE')
         root_rule.appendChild(default_rule)
@@ -493,22 +495,22 @@ class LayerFactory:
         try:
             result = processing.run("native:buffer", params)
             reach_layer = result['OUTPUT']
-            
+
             # Styling: Semi-transparent blue
             symbol = QgsFillSymbol.createSimple({'color': '0,0,255,40', 'outline_color': 'blue'})
             reach_layer.renderer().setSymbol(symbol)
             reach_layer.setOpacity(0.5)
-            
+
             QgsProject.instance().addMapLayer(reach_layer)
             # Uncheck visibility by default
             node = QgsProject.instance().layerTreeRoot().findLayer(reach_layer.id())
-            if node: node.setItemVisibilityChecked(False)
-            QgsMessageLog.logMessage(f"Walking Reach created via native:buffer.", "GTFS Plugin", Qgis.Info)
+            if node:
+                node.setItemVisibilityChecked(False)
+            QgsMessageLog.logMessage("Walking Reach created via native:buffer.", "GTFS Plugin", Qgis.Info)
             return reach_layer
         except Exception as e:
             QgsMessageLog.logMessage(f"Walking Reach Failed: {str(e)}", "GTFS Plugin", Qgis.Critical)
             return None
-
 
     @staticmethod
     def calculate_population_coverage(
@@ -522,19 +524,19 @@ class LayerFactory:
         # Unified walking geometry
         walking_geoms = [f.geometry() for f in walking_layer.getFeatures()]
         unified_walking = QgsGeometry.unaryUnion(walking_geoms)
-        
+
         # Ensure CRS compatibility
         if walking_layer.crs() != pop_layer.crs():
             transform = QgsCoordinateTransform(walking_layer.crs(), pop_layer.crs(), QgsProject.instance())
             unified_walking.transform(transform)
-            
+
         if unified_walking.isEmpty():
             return 0.0
 
         # Create results layer
         result_layer = QgsVectorLayer(
-            f"Polygon?crs={pop_layer.crs().authid()}", 
-            "Population Coverage Map", 
+            f"Polygon?crs={pop_layer.crs().authid()}",
+            "Population Coverage Map",
             "memory"
         )
         pr = result_layer.dataProvider()
@@ -546,43 +548,43 @@ class LayerFactory:
 
         total_pop = 0.0
         features_to_add = []
-        
+
         # Map fields (case-insensitive)
         actual_pop_field = next((f.name() for f in pop_layer.fields() if f.name().lower() == pop_field.lower()), pop_field)
-        
+
         for pop_feat in pop_layer.getFeatures():
             geom = pop_feat.geometry()
             new_feat = QgsFeature(pop_feat)
             new_feat.setFields(result_layer.fields())
-            
+
             if not geom or geom.isEmpty() or not geom.intersects(unified_walking):
                 new_feat.setAttribute("pct_covered", 0.0)
                 features_to_add.append(new_feat)
                 continue
-                
+
             intersection = geom.intersection(unified_walking)
             if intersection.isEmpty():
                 new_feat.setAttribute("pct_covered", 0.0)
                 features_to_add.append(new_feat)
                 continue
-            
+
             # Area-based ratio
             ratio = intersection.area() / geom.area() if geom.area() > 0 else 0.0
             pct = ratio * 100.0
-            
+
             try:
                 val_attr = pop_feat.attribute(actual_pop_field)
                 pop_val = float(val_attr) if val_attr is not None else 0.0
                 total_pop += pop_val * ratio
             except (ValueError, TypeError):
                 pass
-                
+
             new_feat.setAttribute("pct_covered", min(100.0, pct))
             features_to_add.append(new_feat)
-            
+
         pr.addFeatures(features_to_add)
         result_layer.updateExtents()
-        
+
         # Styling: Light to Dark Purple
         my_range = []
         symbol = QgsFillSymbol.createSimple({'color': '#f2f0f7', 'outline_color': 'gray'})
@@ -590,22 +592,21 @@ class LayerFactory:
 
         symbol = QgsFillSymbol.createSimple({'color': '#cbc9e2', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(0.1, 25.0, symbol, '1-25%'))
-        
+
         symbol = QgsFillSymbol.createSimple({'color': '#9e9ac8', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(25.1, 50.0, symbol, '25-50%'))
-        
+
         symbol = QgsFillSymbol.createSimple({'color': '#756bb1', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(50.1, 75.0, symbol, '50-75%'))
-        
+
         symbol = QgsFillSymbol.createSimple({'color': '#54278f', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(75.1, 100.0, symbol, '75-100%'))
-        
+
         renderer = QgsGraduatedSymbolRenderer('pct_covered', my_range)
         result_layer.setRenderer(renderer)
-        
+
         QgsProject.instance().addMapLayer(result_layer)
         return total_pop
-
 
     @staticmethod
     def create_transit_deserts_layer(
@@ -623,7 +624,7 @@ class LayerFactory:
             "memory"
         )
         pr = desert_layer.dataProvider()
-        
+
         # Copy fields from pop_layer
         pr.addAttributes(pop_layer.fields())
         desert_layer.updateFields()
@@ -631,7 +632,7 @@ class LayerFactory:
         # Get unified walking geometry
         walking_geoms = [f.geometry() for f in walking_layer.getFeatures()]
         unified_walking = QgsGeometry.unaryUnion(walking_geoms)
-        
+
         # Ensure CRS compatibility
         if walking_layer.crs() != pop_layer.crs():
             transform = QgsCoordinateTransform(walking_layer.crs(), pop_layer.crs(), QgsProject.instance())
@@ -648,7 +649,7 @@ class LayerFactory:
                     pop_val = float(pop_feat.attribute(pop_field))
                 except (ValueError, TypeError):
                     pass
-                
+
                 if pop_val > 0:
                     features_to_add.append(pop_feat)
             else:
@@ -662,14 +663,13 @@ class LayerFactory:
                         pass
                     if pop_val > 0:
                         features_to_add.append(pop_feat)
-        
+
         pr.addFeatures(features_to_add)
         desert_layer.updateExtents()
-        
+
         # Style: Semi-transparent Red
         symbol = QgsFillSymbol.createSimple({'color': '255,0,0,100', 'outline_color': 'red'})
         desert_layer.renderer().setSymbol(symbol)
 
         QgsProject.instance().addMapLayer(desert_layer)
         return desert_layer
-

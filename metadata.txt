@@ -11,7 +11,7 @@ qgisMinimumVersion=3.4
 author=@arrobaraujo
 email=arrobaraujo@icloud.com
 repository=https://github.com/arrobaraujo/qgis_gtfs_plugin
-bugtracker=https://github.com/arrobaraujo/qgis_gtfs_plugin/issues
+tracker=https://github.com/arrobaraujo/qgis_gtfs_plugin/issues
 
 category=Plugins
 tags=GTFS, transport, transit, shape, stop, bus, subway, analysis, heatmap, coverage

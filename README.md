@@ -1,73 +1,75 @@
 # GTFS 2 GIS
 
+**English** | [Português](README.pt-BR.md)
+
 [![QGIS Version](https://img.shields.io/badge/QGIS-3.4+-green.svg)](https://qgis.org/) 
-[![Version](https://img.shields.io/badge/version-0.2.8-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
+[![Version](https://img.shields.io/badge/version-0.2.9-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-red.svg)](LICENSE)
 
-O **GTFS 2 GIS** é um plugin para QGIS desenvolvido para visualização e análise de redes de transporte público a partir de arquivos GTFS (General Transit Feed Specification).
+**GTFS 2 GIS** is a QGIS plugin designed for visualizing and analyzing public transit networks from GTFS (General Transit Feed Specification) ZIP files.
 
 ---
 
-## 🚀 Funcionalidades Principais
+## 🚀 Key Features
 
-- **Shapes Otimizados**: Agrupa viagens por `shape_id` para evitar linhas sobrepostas, com larguras de linha baseadas na frequência.
-- **Inteligência de Paradas**:
-    - Lista todas as linhas que passam por um ponto.
-    - Identifica terminais e quais linhas encerram ali.
-    - Ícones por tipo de transporte (🚌 Ônibus, 🚇 Metrô, 🚄 Trem, ⛴️ Barca).
-- **Dados Financeiros**: Extrai preços de tarifas vinculados às rotas.
-- **Estilização Automática**: Aplica as cores oficiais das rotas definidas nos dados GTFS.
-- **Painel de Analytics**: Dashboard em tempo real com estatísticas (km totais, densidade de pontos, frotas, etc.).
-- **Filtro por Período**: Filtre linhas por horários (Pico Manhã, Entrepico, Pico Tarde, Noite).
-
----
-
-## 🔧 Ferramentas de Análise
-
-- **Mapa de Calor de Frequência**: Camadas graduadas pela intensidade da frequência.
-- **Cobertura Populacional**: Calcula a população atendida em raios de caminhada (usando dados IBGE).
-- **Desertos de Trânsito**: Identifica áreas populosas com pouco ou nenhum acesso a transporte.
-- **Acessibilidade**: Cria buffers de 400m e análise de isócronas reais por rede viária.
+- **Optimized Shapes**: Groups trips by `shape_id` to avoid overlapping lines, with frequency-based line widths.
+- **Stop Intelligence**:
+    - Lists all lines passing through a stop.
+    - Identifies terminals and which lines terminate there.
+    - Icons by transit type (🚌 Bus, 🚇 Subway, 🚄 Rail, ⛴️ Ferry).
+- **Financial Data**: Extracts fare prices linked to routes.
+- **Automatic Styling**: Applies official route colors defined in GTFS data.
+- **Analytics Dashboard**: Real-time statistics panel (total km, stop density, fleets, etc.).
+- **Period Filtering**: Filter lines by time slots (Morning Peak, Midday, Evening Peak, Night).
 
 ---
 
-## 🛠 Instalação
+## 🔧 Analysis Tools
 
-### Via Repositório Oficial do QGIS (Recomendado)
-1. No QGIS, vá em **Plugins** -> **Gerenciar e Instalar Plugins**.
-2. Procure por **"GTFS 2 GIS"** e clique em **Instalar**.
+- **Frequency Heatmap**: Graduated layers showing frequency intensity.
+- **Population Coverage**: Calculates population served within walking reach (using IBGE census data for Brazil).
+- **Transit Deserts**: Identifies populated areas with little to no transit access.
+- **Accessibility**: Creates 400m buffers and real-world network-based isochrones.
 
-### Instalação Manual
-1. Baixe o código deste repositório.
-2. Certifique-se de que o conteúdo do plugin está dentro de uma pasta chamada `qgis_gtfs_plugin`.
-3. Copie a pasta para o diretório de plugins do QGIS:
+---
+
+## 🛠 Installation
+
+### Via Official QGIS Repository (Recommended)
+1. In QGIS, go to **Plugins** -> **Manage and Install Plugins**.
+2. Search for **"GTFS 2 GIS"** and click **Install**.
+
+### Manual Installation
+1. Download this repository's code.
+2. Ensure the plugin content is inside a folder named `qgis_gtfs_plugin`.
+3. Copy the folder to your QGIS plugins directory:
    - **Windows**: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
    - **Linux**: `~/.local/share/QGIS/QGIS3/profiles\default\python\plugins\`
    - **macOS**: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`
-4. Habilite o plugin no Gerenciador de Plugins.
+4. Enable the plugin in the Plugin Manager.
 
 ---
 
-## 📖 Como Usar
+## 📖 How to Use
 
-1. Vá em **Plugins** -> **GTFS 2 GIS** -> **Load GTFS...**.
-2. Selecione um arquivo `.zip` de GTFS.
-3. As camadas de linhas e pontos serão criadas com todos os metadados.
-4. Use o painel **GTFS Analytics** para filtros e ferramentas avançadas.
-
----
-
-## 🤖 Desenvolvimento e CI/CD
-
-Este projeto utiliza **GitHub Actions** para automação de publicação.
-- Cada nova **Tag** (ex: `v0.2.8`) dispara um workflow que valida os metadados e publica automaticamente no repositório oficial do QGIS.
-
-Se desejar contribuir, sinta-se à vontade para abrir um **Pull Request** ou relatar bugs no [Issue Tracker](https://github.com/arrobaraujo/qgis_gtfs_plugin/issues).
+1. Go to **Plugins** -> **GTFS 2 GIS** -> **Load GTFS...**.
+2. Select a GTFS `.zip` file.
+3. Lines and stops layers will be created with all metadata.
+4. Use the **GTFS Analytics** panel for advanced filtering and tools.
 
 ---
 
-## ⚖ Licença
+## 🤖 Development and CI/CD
+
+This project uses **GitHub Actions** for automated publication.
+- Every new **Tag** (e.g., `v0.2.9`) triggers a workflow that validates metadata and automatically publishes to the official QGIS repository.
+
+If you wish to contribute, feel free to open a **Pull Request** or report bugs in the [Issue Tracker](https://github.com/arrobaraujo/qgis_gtfs_plugin/issues).
+
+---
+
+## ⚖ License
 
 GNU GPL v3.
 
-Desenvolvido por **[@arrobaraujo](https://github.com/arrobaraujo)**.
+Developed by **[Erick Araujo - @arrobaraujo](https://github.com/arrobaraujo)**.

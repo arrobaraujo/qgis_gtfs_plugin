@@ -1,11 +1,11 @@
 # Changelog
 
-## [0.3.9] - 2026-03-24
+## [0.4.0] - 2026-03-24
+- CI/CD Fix: Added explicit OSGeo server URL to `publish.yml`.
 - Global code quality audit: Applied PEP8 compliance to all `.py` files.
-- Fixed indentation, trailing whitespaces, and spacing in `processor.py`, `search_panel.py`, `plugin.py`, and `gtfs_dialog.py`.
-- Normalized exception handling patterns.
+- Refactored `processor.py`, `search_panel.py`, and `plugin.py`.
 
-## [0.3.8] - 2026-03-24
+## [0.3.9] - 2026-03-24
 - Rounded `shape_ext` values to integers as requested.
 
 ## [0.3.7] - 2026-03-24

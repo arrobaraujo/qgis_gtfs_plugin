@@ -40,7 +40,6 @@ jobs:
         run: >
           qgis-plugin-ci
           release ${GITHUB_REF_NAME}
-          --osgeo-username "$OSGEO_USER"
-          --osgeo-password "$OSGEO_PASSWORD"
-          --osgeo-server https://plugins.qgis.org
+          --osgeo-username ${{ secrets.OSGEO_USER }}
+          --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
           --github-token ${{ secrets.GITHUB_TOKEN }}

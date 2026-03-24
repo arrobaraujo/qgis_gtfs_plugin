@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.1] - 2026-03-24
+- CI/CD Fix: Used direct secret injection in `publish.yml` to ensure credential passing.
+
 ## [0.4.0] - 2026-03-24
 - CI/CD Fix: Added explicit OSGeo server URL to `publish.yml`.
 - Global code quality audit: Applied PEP8 compliance to all `.py` files.

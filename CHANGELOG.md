@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.7] - 2026-03-24
+- Emergency fix: Restored `processor.py` and `search_panel.py` content and finalized PEP8 compliance across all core modules.
+
 ## [0.4.6] - 2026-03-24
 - Extended PEP8 compliance: Resolved all styling issues in `processor.py` and `search_panel.py`, including unused imports and ambiguous variable names.
 

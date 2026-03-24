@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.2] - 2026-03-24
+- Exhaustive code style refactor: Resolved 120+ PEP8 violations in `layer_factory.py` (whitespace, indentation, and structure).
+
 ## [0.4.1] - 2026-03-24
 - CI/CD Fix: Used direct secret injection in `publish.yml` to ensure credential passing.
 

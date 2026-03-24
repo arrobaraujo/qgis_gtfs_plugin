@@ -165,7 +165,7 @@ class LayerFactory:
 
         pr.addFeatures(features)
         layer.updateExtents()
-        
+
         # Styling
         symbol = layer.renderer().symbol()
         if symbol:
@@ -173,9 +173,9 @@ class LayerFactory:
                 sl = symbol.symbolLayer(i)
                 sl.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("color"))
                 # Base width 0.4, grows with frequency up to 2.5
-                sl.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeWidth, 
+                sl.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeWidth,
                                           QgsProperty.fromExpression('scale_linear("frequency", 1, 100, 0.4, 2.5)'))
-        
+
         # Rendering Order: Thicker lines (higher frequency) at the bottom
         # QGIS renders from first to last, so we want high frequency first.
         # Set feature rendering order (high frequency/thicker lines at the bottom)
@@ -183,47 +183,48 @@ class LayerFactory:
         clause = QgsFeatureRequest.OrderByClause("frequency", False) # Descending = drawn first = at bottom
         renderer.setOrderBy(QgsFeatureRequest.OrderBy([clause]))
         renderer.setOrderByEnabled(True)
-        
+
         # Labeling
         label_settings = QgsPalLayerSettings()
         label_settings.fieldName = "line"
         label_settings.placement = QgsPalLayerSettings.Line
-        
+
         text_format = QgsTextFormat()
         text_format.setSize(8)
         text_format.setColor(QtGui.QColor(0, 0, 0))
-        
+
         buffer_settings = QgsTextBufferSettings()
         buffer_settings.setEnabled(True)
         buffer_settings.setSize(1)
         buffer_settings.setColor(QtGui.QColor(255, 255, 255))
         text_format.setBuffer(buffer_settings)
-        
+
         label_settings.setFormat(text_format)
         layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
         layer.setDisplayExpression("line")
-        
+
         QgsProject.instance().addMapLayer(layer)
         return layer
 
     @staticmethod
     def create_frequency_heatmap_layer(source_layer: QgsVectorLayer):
         """Creates a new layer 'lines - heatmap' and applies a graduated renderer."""
-        if not source_layer: return
-        
+        if not source_layer:
+            return
+
         # Clone the layer
         heatmap_layer = QgsVectorLayer(
-            source_layer.source(), 
-            "lines - heatmap", 
+            source_layer.source(),
+            "lines - heatmap",
             source_layer.providerType()
         )
-        
+
         # Copy features
         pr = heatmap_layer.dataProvider()
         pr.addAttributes(source_layer.fields())
         heatmap_layer.updateFields()
         pr.addFeatures([f for f in source_layer.getFeatures()])
-        
+
         my_range = []
         styles = [
             (1, 10, "#ffffb2", 0.6, "Low (1-10)"),
@@ -232,7 +233,7 @@ class LayerFactory:
             (81, 150, "#f03b20", 2.2, "Very High (81-150)"),
             (151, 9999, "#bd0026", 3.0, "Major Corridor (150+)")
         ]
-        
+
         for low, high, color, width, label in styles:
             symbol = QgsLineSymbol.createSimple({
                 'color': color,
@@ -240,19 +241,19 @@ class LayerFactory:
                 'line_style': 'solid'
             })
             my_range.append(QgsRendererRange(low, high, symbol, label))
-            
+
         renderer = QgsGraduatedSymbolRenderer('frequency', my_range)
         heatmap_layer.setRenderer(renderer)
         QgsProject.instance().addMapLayer(heatmap_layer)
         return heatmap_layer
 
     @staticmethod
-    def create_network_isochrones(road_layer: QgsVectorLayer, 
-                                  stops_layer: QgsVectorLayer, 
+    def create_network_isochrones(road_layer: QgsVectorLayer,
+                                  stops_layer: QgsVectorLayer,
                                   distance: float):
         """Generates a network-based reach layer using QGIS processing."""
         import processing
-        
+
         # We'll use 'native:serviceareafrompoints'
         # It calculates the part of the network reachable within a certain cost
         params = {
@@ -279,14 +280,14 @@ class LayerFactory:
             target_alg = next((a for a in possible_ids if a in all_algs), None)
 
         if not target_alg:
-             raise Exception("No service area algorithm found in QGIS. Please check your Network Analysis provider.")
+            raise Exception("No service area algorithm found in QGIS. Please check your Network Analysis provider.")
 
         try:
             result = processing.run(target_alg, params)
         except Exception as e:
             QgsMessageLog.logMessage(f"Service Area Failed with {target_alg}. Error: {str(e)}", "GTFS Plugin", Qgis.Critical)
             raise e
-            
+
         output_layer = result['OUTPUT']
         
         # Add to project
@@ -301,6 +302,7 @@ class LayerFactory:
         output_layer.setRenderer(QgsSingleSymbolRenderer(symbol))
         output_layer.triggerRepaint()
 
+
     @staticmethod
     def create_stop_layer(stops: Dict[str, Dict[str, Any]], 
                            stop_to_routes: Dict[str, Set[str]], 
@@ -314,7 +316,7 @@ class LayerFactory:
 
         layer = QgsVectorLayer("Point?crs=epsg:4326", "Stops", "memory")
         pr = layer.dataProvider()
-        
+
         from qgis.PyQt.QtCore import QMetaType
         pr.addAttributes([
             QgsField("stop_id", QMetaType.QString),
@@ -339,7 +341,7 @@ class LayerFactory:
         for stop_id, s in stops.items():
             feat = QgsFeature()
             feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(s['lon'], s['lat'])))
-            
+
             # General routes
             route_ids = stop_to_routes.get(stop_id, [])
             route_names = []
@@ -361,7 +363,7 @@ class LayerFactory:
             r_types = stop_route_types.get(stop_id, set())
             r_types_list = sorted(list(r_types))
             r_types_str = ", ".join(r_types_list)
-            
+
             # Primary transit type for icon (priority: Subway > Rail > Tram > Ferry > Bus)
             primary_type = 3 # Default Bus
             if r_types:
@@ -391,7 +393,7 @@ class LayerFactory:
 
         pr.addFeatures(features)
         layer.updateExtents()
-        
+
         # Styling - Rule Based Symbology with Layered Markers (Circle + Emoji)
         def create_layered_symbol(color, char):
             symbol = QgsMarkerSymbol()
@@ -438,7 +440,7 @@ class LayerFactory:
         ]
 
         root_rule = QgsRuleBasedRenderer.Rule(None)
-        
+
         # Only add rules that are present in the data
         any_rule_added = False
         for label, exp, color, char, tid in rules:
@@ -450,7 +452,7 @@ class LayerFactory:
         # Default rule if nothing matches or others exist
         default_rule = QgsRuleBasedRenderer.Rule(create_layered_symbol('#808080', '🚏'), label='Other', filterExp='ELSE')
         root_rule.appendChild(default_rule)
-        
+
         layer.setRenderer(QgsRuleBasedRenderer(root_rule))
 
         # Labeling
@@ -470,7 +472,7 @@ class LayerFactory:
         """Creates a 400m buffer using native:buffer for maximum reliability."""
         if not stop_layer or stop_layer.featureCount() == 0:
             return None
-            
+
         import processing
         params = {
             'INPUT': stop_layer,
@@ -482,7 +484,7 @@ class LayerFactory:
             'DISSOLVE': False,
             'OUTPUT': 'memory:Walking Reach'
         }
-        
+
         try:
             result = processing.run("native:buffer", params)
             reach_layer = result['OUTPUT']
@@ -501,6 +503,7 @@ class LayerFactory:
         except Exception as e:
             QgsMessageLog.logMessage(f"Walking Reach Failed: {str(e)}", "GTFS Plugin", Qgis.Critical)
             return None
+
 
     @staticmethod
     def calculate_population_coverage(walking_layer: QgsVectorLayer, 
@@ -578,7 +581,7 @@ class LayerFactory:
         my_range = []
         symbol = QgsFillSymbol.createSimple({'color': '#f2f0f7', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(0.0, 0.0, symbol, '0%'))
-        
+
         symbol = QgsFillSymbol.createSimple({'color': '#cbc9e2', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(0.1, 25.0, symbol, '1-25%'))
         
@@ -598,7 +601,6 @@ class LayerFactory:
         return total_pop
 
 
-
     @staticmethod
     def create_transit_deserts_layer(walking_layer: QgsVectorLayer, 
                                      pop_layer: QgsVectorLayer, 
@@ -609,8 +611,8 @@ class LayerFactory:
 
         # Create memory layer
         desert_layer = QgsVectorLayer(
-            f"Polygon?crs={pop_layer.crs().authid()}", 
-            "Transit Deserts", 
+            f"Polygon?crs={pop_layer.crs().authid()}",
+            "Transit Deserts",
             "memory"
         )
         pr = desert_layer.dataProvider()
@@ -618,7 +620,7 @@ class LayerFactory:
         # Copy fields from pop_layer
         pr.addAttributes(pop_layer.fields())
         desert_layer.updateFields()
-        
+
         # Get unified walking geometry
         walking_geoms = [f.geometry() for f in walking_layer.getFeatures()]
         unified_walking = QgsGeometry.unaryUnion(walking_geoms)
@@ -627,7 +629,7 @@ class LayerFactory:
         if walking_layer.crs() != pop_layer.crs():
             transform = QgsCoordinateTransform(walking_layer.crs(), pop_layer.crs(), QgsProject.instance())
             unified_walking.transform(transform)
-        
+
         features_to_add = []
         for pop_feat in pop_layer.getFeatures():
             geom = pop_feat.geometry()
@@ -658,7 +660,7 @@ class LayerFactory:
         # Style: Semi-transparent Red
         symbol = QgsFillSymbol.createSimple({'color': '255,0,0,100', 'outline_color': 'red'})
         desert_layer.renderer().setSymbol(symbol)
-        
+
         QgsProject.instance().addMapLayer(desert_layer)
         return desert_layer
 

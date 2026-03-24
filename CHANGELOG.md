@@ -1,7 +1,10 @@
 # Changelog
 
+## [0.3.7] - 2026-03-24
+- Added `shape_ext` attribute to the Lines layer (ellipsoidal distance in meters).
+- Verified CI workflow for official QGIS repository publication.
+
 ## [0.3.6] - 2026-03-24
-- Streamlined CI workflow: removed redundant steps to avoid race conditions.
 
 ## [0.3.5] - 2026-03-24
 

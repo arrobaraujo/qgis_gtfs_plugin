@@ -69,11 +69,17 @@ class LayerFactory:
             QgsField("fare", QMetaType.QString),
             QgsField("color", QMetaType.QString),
             QgsField("frequency", QMetaType.Int),
+            QgsField("shape_ext", QMetaType.Double),
             QgsField("start_time", QMetaType.QString),
             QgsField("end_time", QMetaType.QString),
             QgsField("start_period", QMetaType.QString)
         ])
         layer.updateFields()
+
+        # Distance calculator for shape_ext (ellipsoidal distance in meters)
+        from qgis.core import QgsDistanceArea
+        d_area = QgsDistanceArea()
+        d_area.setEllipsoid('WGS84')
 
         features = []
         for sid, points in shapes.items():
@@ -84,6 +90,8 @@ class LayerFactory:
             
             if len(qgs_points) < 2:
                 continue
+
+            length_m = d_area.measureLine(qgs_points)
 
             feat = QgsFeature()
             feat.setGeometry(QgsGeometry.fromPolylineXY(qgs_points))
@@ -139,6 +147,7 @@ class LayerFactory:
                 str(agency_name), str(trip_name), str(trip.get('direction', '')), str(transit_type),
                 str(route_to_price.get(route_id, '')), str(color), 
                 int(shape_frequencies.get(sid, 0)),
+                float(length_m),
                 str(start_t), str(end_t), str(period)
             ])
             features.append(feat)

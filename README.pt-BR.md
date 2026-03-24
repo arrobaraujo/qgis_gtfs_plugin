@@ -3,7 +3,7 @@
 [English](README.md) | **Português**
 
 [![QGIS Version](https://img.shields.io/badge/QGIS-3.4+-green.svg)](https://qgis.org/) 
-[![Version](https://img.shields.io/badge/version-0.3.5-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
+[![Version](https://img.shields.io/badge/version-0.3.6-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-red.svg)](LICENSE)
 
 O **GTFS 2 GIS** é um plugin para QGIS desenvolvido para visualização e análise de redes de transporte público a partir de arquivos GTFS (General Transit Feed Specification).
@@ -62,7 +62,7 @@ O **GTFS 2 GIS** é um plugin para QGIS desenvolvido para visualização e anál
 ## 🤖 Desenvolvimento e CI/CD
 
 Este projeto utiliza **GitHub Actions** para automação de publicação.
-- Cada nova **Tag** (ex: `0.3.5`) dispara um workflow que valida os metadados e publica automaticamente no repositório oficial do QGIS.
+- Cada nova **Tag** (ex: `0.3.6`) dispara um workflow que valida os metadados e publica automaticamente no repositório oficial do QGIS.
 
 Se desejar contribuir, sinta-se à vontade para abrir um **Pull Request** ou relatar bugs no [Issue Tracker](https://github.com/arrobaraujo/qgis_gtfs_plugin/issues).
 

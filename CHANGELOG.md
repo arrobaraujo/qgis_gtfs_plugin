@@ -1,7 +1,9 @@
 # Changelog
 
+## [0.3.6] - 2026-03-24
+- Streamlined CI workflow: removed redundant steps to avoid race conditions.
+
 ## [0.3.5] - 2026-03-24
-- Clean release attempt for CI validation after manual 0.3.4 sync.
 
 ## [0.3.4] - 2026-03-24
 

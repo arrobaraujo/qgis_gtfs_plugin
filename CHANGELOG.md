@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.6] - 2026-03-24
+- Extended PEP8 compliance: Resolved all styling issues in `processor.py` and `search_panel.py`, including unused imports and ambiguous variable names.
+
 ## [0.4.5] - 2026-03-24
 - Absolute zero-tolerance PEP8 fix for `layer_factory.py`: Fixed hidden whitespaces, multi-statement exceptions, and restored accidentally truncated processing logic.
 

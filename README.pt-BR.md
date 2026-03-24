@@ -1,4 +1,4 @@
-# GTFS 2 GIS - Plugin QGIS (v0.4.5)
+# GTFS 2 GIS - Plugin QGIS (v0.4.6)
 
 [English](README.md) | **Português**
 

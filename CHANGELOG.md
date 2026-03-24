@@ -1,8 +1,9 @@
 # Changelog
 
+## [0.3.8] - 2026-03-24
+- Rounded `shape_ext` values to integers as requested.
+
 ## [0.3.7] - 2026-03-24
-- Added `shape_ext` attribute to the Lines layer (ellipsoidal distance in meters).
-- Verified CI workflow for official QGIS repository publication.
 
 ## [0.3.6] - 2026-03-24
 

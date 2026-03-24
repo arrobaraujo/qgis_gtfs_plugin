@@ -40,10 +40,12 @@ jobs:
           fail-if-no-assets: false
 
       - name: Release to QGIS Repository
+        env:
+          OSGEO_USER: ${{ secrets.OSGEO_USER }}
+          OSGEO_PASSWORD: ${{ secrets.OSGEO_PASSWORD }}
         run: >
           qgis-plugin-ci
           release ${GITHUB_REF_NAME}
-          --osgeo-username ${{ secrets.OSGEO_USER }}
-          --osgeo-password ${{ secrets.OSGEO_PASSWORD }}
+          --osgeo-username "$OSGEO_USER"
+          --osgeo-password "$OSGEO_PASSWORD"
           --github-token ${{ secrets.GITHUB_TOKEN }}
-          --create-plugin-repo

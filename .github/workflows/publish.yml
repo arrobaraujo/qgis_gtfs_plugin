@@ -31,6 +31,13 @@ jobs:
           draft: false
           prerelease: false
 
+      - name: Delete existing assets (for tag reuse)
+        uses: mknejp/delete-release-assets@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+          assets: '*'
+
       - name: Release to QGIS Repository
         run: >
           qgis-plugin-ci

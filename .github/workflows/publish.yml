@@ -49,5 +49,4 @@ jobs:
           release ${GITHUB_REF_NAME}
           --osgeo-username "$OSGEO_USER"
           --osgeo-password "$OSGEO_PASSWORD"
-          --osgeo-server https://plugins.qgis.org
           --github-token ${{ secrets.GITHUB_TOKEN }}

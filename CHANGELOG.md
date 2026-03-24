@@ -1,10 +1,10 @@
 # Changelog
 
+## [0.3.3] - 2026-03-24
+- Final fix for publication: removed invalid parameters and verified secrets.
+- Guaranteed numeric version parity for the official repository.
+
 ## [0.3.2] - 2026-03-24
-- Final standardization for official repository approval.
-- Added explicit `license` tag to metadata.
-- Standardized author name for OSGeo account compatibility.
-- Fixed CI workflow to explicitly target `plugins.qgis.org`.
 
 ## [0.3.1] - 2026-03-24
 

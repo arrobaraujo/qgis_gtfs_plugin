@@ -1,8 +1,9 @@
 # Changelog
 
+## [0.3.4] - 2026-03-24
+- Final publication attempt after account credential sync.
+
 ## [0.3.3] - 2026-03-24
-- Final fix for publication: removed invalid parameters and verified secrets.
-- Guaranteed numeric version parity for the official repository.
 
 ## [0.3.2] - 2026-03-24
 

@@ -6,12 +6,13 @@ name=GTFS 2 GIS
 description=Visualize and analyze GTFS transit data in QGIS with styled layers, dashboards, and spatial tools.
 about=A comprehensive QGIS plugin for loading, visualizing, and analyzing GTFS (General Transit Feed Specification) data. Features include: styled route and stop layers with transit-type icons, frequency heatmaps, population coverage analysis (IBGE), transit desert detection, walking reach buffers, network isochrones, period-based filtering, and a real-time analytics dashboard.
 homepage=https://github.com/arrobaraujo/qgis_gtfs_plugin
-version=0.3.1
+version=0.3.2
 qgisMinimumVersion=3.4
-author=@arrobaraujo
+author=Erick Araujo
 email=arrobaraujo@icloud.com
 repository=https://github.com/arrobaraujo/qgis_gtfs_plugin
 tracker=https://github.com/arrobaraujo/qgis_gtfs_plugin/issues
+license=GPLv3
 
 category=Vector
 tags=GTFS, transport, transit, shape, stop, bus, subway, analysis, heatmap, coverage

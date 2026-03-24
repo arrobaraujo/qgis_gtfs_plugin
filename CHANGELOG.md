@@ -1,11 +1,12 @@
 # Changelog
 
+## [0.3.2] - 2026-03-24
+- Final standardization for official repository approval.
+- Added explicit `license` tag to metadata.
+- Standardized author name for OSGeo account compatibility.
+- Fixed CI workflow to explicitly target `plugins.qgis.org`.
+
 ## [0.3.1] - 2026-03-24
-- Standardized metadata for official QGIS repository approval.
-- Fixed `category` field to `Vector` (standard QGIS category).
-- Set `experimental` flag to `True` for initial repository submission.
-- Added missing `__init__.py` files to `core` and `ui` packages.
-- Cleaned up tags and metadata links.
 
 ## [0.3.0] - 2026-03-24 (Internal/Failed)
 - Final fix for publication workflow and project structure.

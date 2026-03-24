@@ -10,6 +10,7 @@ try:
 except ImportError:
     pass
 
+
 class GTFSProcessor:
     """Handles the parsing and processing of GTFS files from a ZIP archive."""
 
@@ -59,13 +60,20 @@ class GTFSProcessor:
                 for row in reader:
                     sid = row['service_id']
                     days = []
-                    if row.get('monday') == '1': days.append(0)
-                    if row.get('tuesday') == '1': days.append(1)
-                    if row.get('wednesday') == '1': days.append(2)
-                    if row.get('thursday') == '1': days.append(3)
-                    if row.get('friday') == '1': days.append(4)
-                    if row.get('saturday') == '1': days.append(5)
-                    if row.get('sunday') == '1': days.append(6)
+                    if row.get('monday') == '1':
+                        days.append(0)
+                    if row.get('tuesday') == '1':
+                        days.append(1)
+                    if row.get('wednesday') == '1':
+                        days.append(2)
+                    if row.get('thursday') == '1':
+                        days.append(3)
+                    if row.get('friday') == '1':
+                        days.append(4)
+                    if row.get('saturday') == '1':
+                        days.append(5)
+                    if row.get('sunday') == '1':
+                        days.append(6)
                     self.service_to_days[sid] = days
 
     def _parse_routes(self, z, files):
@@ -74,7 +82,8 @@ class GTFSProcessor:
                 reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
                 for row in reader:
                     rid = row.get('route_id')
-                    if not rid: continue
+                    if not rid:
+                        continue
                     self.routes[rid] = {
                         'short_name': row.get('route_short_name', ''),
                         'long_name': row.get('route_long_name', ''),
@@ -107,9 +116,12 @@ class GTFSProcessor:
                     sid = row['service_id']
                     if service_day != 'All':
                         days = self.service_to_days.get(sid, [])
-                        if service_day == 'Weekday' and not any(d < 5 for d in days): continue
-                        if service_day == 'Saturday' and 5 not in days: continue
-                        if service_day == 'Sunday' and 6 not in days: continue
+                        if service_day == 'Weekday' and not any(d < 5 for d in days):
+                            continue
+                        if service_day == 'Saturday' and 5 not in days:
+                            continue
+                        if service_day == 'Sunday' and 6 not in days:
+                            continue
                     self.trips.append({
                         'trip_id': row['trip_id'],
                         'route_id': row['route_id'],
@@ -128,8 +140,13 @@ class GTFSProcessor:
                 reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
                 for row in reader:
                     sid = row['shape_id']
-                    if sid not in self.shapes: self.shapes[sid] = []
-                    self.shapes[sid].append({'lat': float(row['shape_pt_lat']), 'lon': float(row['shape_pt_lon']), 'seq': int(row['shape_pt_sequence'])})
+                    if sid not in self.shapes:
+                        self.shapes[sid] = []
+                    self.shapes[sid].append({
+                        'lat': float(row['shape_pt_lat']),
+                        'lon': float(row['shape_pt_lon']),
+                        'seq': int(row['shape_pt_sequence'])
+                    })
             da = QgsDistanceArea()
             da.setEllipsoid('WGS84')
             for sid, points in self.shapes.items():
@@ -147,7 +164,8 @@ class GTFSProcessor:
                 reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
                 for row in reader:
                     sid = row.get('stop_id')
-                    if not sid: continue
+                    if not sid:
+                        continue
                     try:
                         self.stops[sid] = {
                             'name': row.get('stop_name', sid),
@@ -173,30 +191,40 @@ class GTFSProcessor:
                 for row in reader:
                     tid, sid, seq = row['trip_id'], row['stop_id'], int(row['stop_sequence'])
                     arr, dep = row.get('arrival_time', ''), row.get('departure_time', '')
-                    if tid not in trip_times: trip_times[tid] = []
-                    if arr: trip_times[tid].append(arr)
-                    if dep: trip_times[tid].append(dep)
+                    if tid not in trip_times:
+                        trip_times[tid] = []
+                    if arr:
+                        trip_times[tid].append(arr)
+                    if dep:
+                        trip_times[tid].append(dep)
                     rid = trip_to_route.get(tid)
                     if rid:
-                        if sid not in self.stop_to_routes: self.stop_to_routes[sid] = set()
+                        if sid not in self.stop_to_routes:
+                            self.stop_to_routes[sid] = set()
                         self.stop_to_routes[sid].add(rid)
                         rtype = self.routes.get(rid, {}).get('type', '3')
-                        if sid not in self.stop_route_types: self.stop_route_types[sid] = set()
+                        if sid not in self.stop_route_types:
+                            self.stop_route_types[sid] = set()
                         self.stop_route_types[sid].add(rtype)
-                        if tid not in trip_last_stop or seq > trip_last_stop[tid][1]: trip_last_stop[tid] = (sid, seq)
+                        if tid not in trip_last_stop or seq > trip_last_stop[tid][1]:
+                            trip_last_stop[tid] = (sid, seq)
             for tid, times in trip_times.items():
-                if not times: continue
+                if not times:
+                    continue
                 sid = trip_to_shape.get(tid)
                 if sid:
-                    if sid not in self.shape_time_ranges: self.shape_time_ranges[sid] = (min(times), max(times))
+                    if sid not in self.shape_time_ranges:
+                        self.shape_time_ranges[sid] = (min(times), max(times))
                     else:
                         cmin, cmax = self.shape_time_ranges[sid]
                         self.shape_time_ranges[sid] = (min(cmin, min(times)), max(cmax, max(times)))
-            for sid, rids in self.stop_to_routes.items(): self.stop_route_counts[sid] = len(rids)
+            for sid, rids in self.stop_to_routes.items():
+                self.stop_route_counts[sid] = len(rids)
             for tid, (sid, _) in trip_last_stop.items():
                 rid = trip_to_route.get(tid)
                 if rid:
-                    if sid not in self.stop_to_pf_routes: self.stop_to_pf_routes[sid] = set()
+                    if sid not in self.stop_to_pf_routes:
+                        self.stop_to_pf_routes[sid] = set()
                     self.stop_to_pf_routes[sid].add(rid)
 
     def get_stats(self) -> Dict[str, Any]:

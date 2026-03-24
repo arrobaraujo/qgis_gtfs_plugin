@@ -32,14 +32,15 @@ from qgis.core import (
 )
 from typing import Dict, List, Set, Any, Tuple, Optional
 
+
 class LayerFactory:
     """Handles the creation and styling of QGIS layers from processed GTFS data."""
 
     @staticmethod
-    def create_shape_layer(trips: List[Dict[str, Any]], 
-                           shapes: Dict[str, List[Dict[str, Any]]], 
-                           routes: Dict[str, Dict[str, Any]], 
-                           agencies: Dict[str, str], 
+    def create_shape_layer(trips: List[Dict[str, Any]],
+                           shapes: Dict[str, List[Dict[str, Any]]],
+                           routes: Dict[str, Dict[str, Any]],
+                           agencies: Dict[str, str],
                            route_to_price: Dict[str, str],
                            shape_frequencies: Dict[str, int],
                            shape_time_ranges: Dict[str, Tuple[str, str]]) -> None:
@@ -54,7 +55,7 @@ class LayerFactory:
 
         layer = QgsVectorLayer("LineString?crs=epsg:4326", "Lines", "memory")
         pr = layer.dataProvider()
-        
+
         from qgis.PyQt.QtCore import QMetaType
         pr.addAttributes([
             QgsField("shape_id", QMetaType.QString),
@@ -85,10 +86,10 @@ class LayerFactory:
         features = []
         for sid, points in shapes.items():
             trip = shape_to_trip.get(sid, {'route_id': '', 'headsign': '', 'short_name': '', 'direction': ''})
-            
+
             sorted_pts = sorted(points, key=lambda x: x['seq'])
             qgs_points = [QgsPointXY(p['lon'], p['lat']) for p in sorted_pts]
-            
+
             if len(qgs_points) < 2:
                 continue
 
@@ -97,7 +98,7 @@ class LayerFactory:
 
             feat = QgsFeature()
             feat.setGeometry(QgsGeometry.fromPolylineXY(qgs_points))
-            
+
             route_id = trip['route_id']
             route_info = routes.get(route_id, {})
             route_name = route_info.get('short_name', '') or route_info.get('long_name', '')
@@ -105,16 +106,21 @@ class LayerFactory:
             route_desc = route_info.get('desc', '')
             agency_id = route_info.get('agency_id', '')
             agency_data = agencies.get(agency_id, '')
-            agency_name = agency_data.get('name', '') if isinstance(agency_data, dict) else agency_data or agencies.get('DEFAULT', '')
-            
+
+            if isinstance(agency_data, dict):
+                agency_name = agency_data.get('name', '')
+            else:
+                agency_name = agency_data or agencies.get('DEFAULT', '')
+
             transit_type = route_info.get('type', '3')
             color = route_info.get('color', '000000')
             if not color.startswith('#'):
                 color = '#' + color
-                
+
             trip_name = trip.get('headsign', '') or trip.get('short_name', '') or ''
 
             time_range = shape_time_ranges.get(sid, ('00:00:00', '23:59:59'))
+
             def format_gtfs_time(t_str):
                 # Simple conversion for temporal controller (using today as base date)
                 try:
@@ -135,11 +141,14 @@ class LayerFactory:
             def get_period(t_str):
                 try:
                     h = int(t_str.split(':')[0])
-                    if 6 <= h < 9: return "Morning Peak"
-                    if 9 <= h < 16: return "Midday"
-                    if 16 <= h < 19: return "Evening Peak"
+                    if 6 <= h < 9:
+                        return "Morning Peak"
+                    if 9 <= h < 16:
+                        return "Midday"
+                    if 16 <= h < 19:
+                        return "Evening Peak"
                     return "Night"
-                except:
+                except Exception:
                     return "Unknown"
 
             period = get_period(time_range[0])
@@ -147,7 +156,7 @@ class LayerFactory:
             feat.setAttributes([
                 str(sid), str(route_id), str(route_name), str(route_long_name), str(route_desc),
                 str(agency_name), str(trip_name), str(trip.get('direction', '')), str(transit_type),
-                str(route_to_price.get(route_id, '')), str(color), 
+                str(route_to_price.get(route_id, '')), str(color),
                 int(shape_frequencies.get(sid, 0)),
                 int(length_int),
                 str(start_t), str(end_t), str(period)

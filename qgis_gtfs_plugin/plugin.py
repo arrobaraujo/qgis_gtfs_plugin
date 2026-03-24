@@ -7,6 +7,7 @@ from .core.processor import GTFSProcessor
 from .core.layer_factory import LayerFactory
 from .core.search_panel import GTFSSearchPanel
 
+
 class GTFSLoader:
     """Main Class for the QGIS GTFS Loader Plugin."""
 
@@ -20,17 +21,17 @@ class GTFSLoader:
     def initGui(self):
         """Create the menu entries and toolbar icons in QGIS."""
         self.action = QtWidgets.QAction(
-            "Load GTFS...", 
+            "Load GTFS...",
             self.iface.mainWindow()
         )
         self.action.triggered.connect(self.run)
-        
+
         self.search_action = QtWidgets.QAction(
             "Show Menu Panel",
             self.iface.mainWindow()
         )
         self.search_action.triggered.connect(self.toggle_search_panel)
-        
+
         self.iface.addPluginToMenu("&GTFS 2 GIS", self.action)
         self.iface.addPluginToMenu("&GTFS 2 GIS", self.search_action)
 
@@ -46,25 +47,25 @@ class GTFSLoader:
     def run(self):
         """Main execution loop of the plugin."""
         dialog = GTFSDialog(self.iface.mainWindow())
-        
+
         if dialog.exec_():
             zip_path = dialog.get_selected_file()
             service_day = dialog.get_service_day()
-            
+
             if not zip_path or not os.path.exists(zip_path):
                 QtWidgets.QMessageBox.warning(
-                    self.iface.mainWindow(), 
-                    "Error", 
+                    self.iface.mainWindow(),
+                    "Error",
                     "Please select a valid ZIP file."
                 )
                 return
-            
+
             try:
                 self.process_gtfs(zip_path, service_day)
             except Exception as e:
                 QtWidgets.QMessageBox.critical(
-                    self.iface.mainWindow(), 
-                    "Fatal Error", 
+                    self.iface.mainWindow(),
+                    "Fatal Error",
                     f"Failed to process GTFS: {str(e)}"
                 )
 
@@ -84,7 +85,7 @@ class GTFSLoader:
             processor.shape_frequencies,
             processor.shape_time_ranges
         )
-        
+
         stop_layer = LayerFactory.create_stop_layer(
             processor.stops,
             processor.stop_to_routes,
@@ -93,7 +94,7 @@ class GTFSLoader:
             processor.routes,
             processor.stop_route_types
         )
-        
+
         # 3. Create Walking Reach layer (400m buffer)
         LayerFactory.create_walking_reach(stop_layer)
 

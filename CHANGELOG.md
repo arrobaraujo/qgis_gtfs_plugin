@@ -1,5 +1,8 @@
 # Changelog
 
+## [0.4.3] - 2026-03-24
+- Absolute PEP8 compliance in `layer_factory.py`: Resolved remaining 86 styling issues (E261, E127, E701, E303, W291/W293).
+
 ## [0.4.2] - 2026-03-24
 - Exhaustive code style refactor: Resolved 120+ PEP8 violations in `layer_factory.py` (whitespace, indentation, and structure).
 

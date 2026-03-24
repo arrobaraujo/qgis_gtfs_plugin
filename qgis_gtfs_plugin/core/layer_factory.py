@@ -37,13 +37,14 @@ class LayerFactory:
     """Handles the creation and styling of QGIS layers from processed GTFS data."""
 
     @staticmethod
-    def create_shape_layer(trips: List[Dict[str, Any]],
-                           shapes: Dict[str, List[Dict[str, Any]]],
-                           routes: Dict[str, Dict[str, Any]],
-                           agencies: Dict[str, str],
-                           route_to_price: Dict[str, str],
-                           shape_frequencies: Dict[str, int],
-                           shape_time_ranges: Dict[str, Tuple[str, str]]) -> None:
+    def create_shape_layer(
+            trips: List[Dict[str, Any]],
+            shapes: Dict[str, List[Dict[str, Any]]],
+            routes: Dict[str, Dict[str, Any]],
+            agencies: Dict[str, str],
+            route_to_price: Dict[str, str],
+            shape_frequencies: Dict[str, int],
+            shape_time_ranges: Dict[str, Tuple[str, str]]) -> None:
         if not shapes:
             return
 
@@ -180,7 +181,7 @@ class LayerFactory:
         # QGIS renders from first to last, so we want high frequency first.
         # Set feature rendering order (high frequency/thicker lines at the bottom)
         renderer = layer.renderer()
-        clause = QgsFeatureRequest.OrderByClause("frequency", False) # Descending = drawn first = at bottom
+        clause = QgsFeatureRequest.OrderByClause("frequency", False)  # Descending = drawn first = at bottom
         renderer.setOrderBy(QgsFeatureRequest.OrderBy([clause]))
         renderer.setOrderByEnabled(True)
 
@@ -248,9 +249,10 @@ class LayerFactory:
         return heatmap_layer
 
     @staticmethod
-    def create_network_isochrones(road_layer: QgsVectorLayer,
-                                  stops_layer: QgsVectorLayer,
-                                  distance: float):
+    def create_network_isochrones(
+            road_layer: QgsVectorLayer,
+            stops_layer: QgsVectorLayer,
+            distance: float):
         """Generates a network-based reach layer using QGIS processing."""
         import processing
 
@@ -259,7 +261,7 @@ class LayerFactory:
         params = {
             'INPUT': road_layer,
             'START_POINTS': stops_layer,
-            'STRATEGY': 0, # Shortest
+            'STRATEGY': 0,  # Shortest
             'DIRECTION_FIELD': '',
             'VALUE_BACKWARD': '',
             'VALUE_FORWARD': '',
@@ -295,7 +297,8 @@ class LayerFactory:
         QgsProject.instance().addMapLayer(output_layer)
         # Uncheck visibility by default
         node = QgsProject.instance().layerTreeRoot().findLayer(output_layer.id())
-        if node: node.setItemVisibilityChecked(False)
+        if node:
+            node.setItemVisibilityChecked(False)
         
         # Simple styling: Red lines
         symbol = QgsLineSymbol.createSimple({'color': '#e31a1c', 'width': '0.4'})
@@ -304,13 +307,14 @@ class LayerFactory:
 
 
     @staticmethod
-    def create_stop_layer(stops: Dict[str, Dict[str, Any]], 
-                           stop_to_routes: Dict[str, Set[str]], 
-                           stop_to_pf_routes: Dict[str, Set[str]],
-                           stop_route_counts: Dict[str, int],
-                           routes: Dict[str, Dict[str, Any]],
-                           stop_route_types: Dict[str, Set[str]],
-                           period: str = "All Periods") -> None:
+    def create_stop_layer(
+            stops: Dict[str, Dict[str, Any]],
+            stop_to_routes: Dict[str, Set[str]],
+            stop_to_pf_routes: Dict[str, Set[str]],
+            stop_route_counts: Dict[str, int],
+            routes: Dict[str, Dict[str, Any]],
+            stop_route_types: Dict[str, Set[str]],
+            period: str = "All Periods") -> None:
         if not stops:
             return
 
@@ -365,7 +369,7 @@ class LayerFactory:
             r_types_str = ", ".join(r_types_list)
 
             # Primary transit type for icon (priority: Subway > Rail > Tram > Ferry > Bus)
-            primary_type = 3 # Default Bus
+            primary_type = 3  # Default Bus
             if r_types:
                 # Basic GTFS types priority
                 priority = {'1': 1, '2': 2, '0': 10, '4': 20, '3': 30}
@@ -373,19 +377,19 @@ class LayerFactory:
                 primary_type = int(sorted_by_pri[0])
 
             feat.setAttributes([
-                stop_id, 
-                s['name'], 
+                stop_id,
+                s['name'],
                 s.get('location_type', ''),
                 s.get('parent_station', ''),
                 s.get('stop_code', ''),
                 s.get('platform_code', ''),
                 route_names_str,
-                is_pf, 
-                pf_route_names_str, 
+                is_pf,
+                pf_route_names_str,
                 s.get('stop_desc', ''),
-                s['lat'], 
+                s['lat'],
                 s['lon'],
-                stop_route_counts.get(stop_id, 0), 
+                stop_route_counts.get(stop_id, 0),
                 r_types_str, 
                 primary_type
             ])
@@ -406,7 +410,7 @@ class LayerFactory:
             symbol.changeSymbolLayer(0, bg_layer)
             # 2. Foreground Emoji
             fg_layer = QgsFontMarkerSymbolLayer()
-            fg_layer.setFontFamily('Arial') # Avoid system-specific font mapping issues
+            fg_layer.setFontFamily('Arial')  # Avoid system-specific font mapping issues
             fg_layer.setCharacter(char)
             fg_layer.setColor(QtGui.QColor(255, 255, 255))
             fg_layer.setSize(2.2)
@@ -417,8 +421,9 @@ class LayerFactory:
         # Priority: Subway > Rail > Tram > Ferry > Bus
         present_types = set()
         for stop_id, s_types in stop_route_types.items():
-            if not s_types: continue
-            priority = {'1': 1, '2': 2, '0': 10, '4': 20, '3': 30, '200': 30} # Note: 200 grouped with Bus priority
+            if not s_types:
+                continue
+            priority = {'1': 1, '2': 2, '0': 10, '4': 20, '3': 30, '200': 30}  # Note: 200 grouped with Bus priority
             sorted_by_pri = sorted(list(s_types), key=lambda x: priority.get(x, 100))
             p_type = sorted_by_pri[0]
             # Convert extended to base types for rule matching if needed
@@ -476,10 +481,10 @@ class LayerFactory:
         import processing
         params = {
             'INPUT': stop_layer,
-            'DISTANCE': 0.0036, # ~400m in degrees for 4326
+            'DISTANCE': 0.0036,  # ~400m in degrees for 4326
             'SEGMENTS': 25,
-            'END_CAP_STYLE': 0, # Round
-            'JOIN_STYLE': 0, # Round
+            'END_CAP_STYLE': 0,  # Round
+            'JOIN_STYLE': 0,  # Round
             'MITER_LIMIT': 2,
             'DISSOLVE': False,
             'OUTPUT': 'memory:Walking Reach'
@@ -506,9 +511,10 @@ class LayerFactory:
 
 
     @staticmethod
-    def calculate_population_coverage(walking_layer: QgsVectorLayer, 
-                                     pop_layer: QgsVectorLayer, 
-                                     pop_field: str) -> float:
+    def calculate_population_coverage(
+            walking_layer: QgsVectorLayer,
+            pop_layer: QgsVectorLayer,
+            pop_field: str) -> float:
         """Calculates total population covered by walking reach and generates a % coverage map."""
         if not walking_layer or not pop_layer:
             return 0.0
@@ -602,9 +608,10 @@ class LayerFactory:
 
 
     @staticmethod
-    def create_transit_deserts_layer(walking_layer: QgsVectorLayer, 
-                                     pop_layer: QgsVectorLayer, 
-                                     pop_field: str) -> Optional[QgsVectorLayer]:
+    def create_transit_deserts_layer(
+            walking_layer: QgsVectorLayer,
+            pop_layer: QgsVectorLayer,
+            pop_field: str) -> Optional[QgsVectorLayer]:
         """Creates a layer highlighting areas with population but no walking reach coverage."""
         if not walking_layer or not pop_layer:
             return None
@@ -639,7 +646,8 @@ class LayerFactory:
                 pop_val = 0
                 try:
                     pop_val = float(pop_feat.attribute(pop_field))
-                except (ValueError, TypeError): pass
+                except (ValueError, TypeError):
+                    pass
                 
                 if pop_val > 0:
                     features_to_add.append(pop_feat)
@@ -650,7 +658,8 @@ class LayerFactory:
                     pop_val = 0
                     try:
                         pop_val = float(pop_feat.attribute(pop_field))
-                    except (ValueError, TypeError): pass
+                    except (ValueError, TypeError):
+                        pass
                     if pop_val > 0:
                         features_to_add.append(pop_feat)
         

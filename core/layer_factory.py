@@ -12,8 +12,11 @@ from qgis.core import (
     QgsVectorLayerSimpleLabeling,
     QgsTextFormat,
     QgsTextBufferSettings,
+    QgsProperty,
     QgsSymbolLayer,
-    QgsProperty
+    QgsFontMarkerSymbolLayer,
+    QgsMarkerSymbol,
+    QgsSingleSymbolRenderer
 )
 from typing import Dict, List, Set, Any
 
@@ -113,8 +116,8 @@ class LayerFactory:
         buffer_settings.setColor(QtGui.QColor(255, 255, 255))
         text_format.setBuffer(buffer_settings)
         
-        label_settings.setFormat(text_format)
         layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
+        layer.setDisplayExpression("service")
         
         QgsProject.instance().addMapLayer(layer)
 
@@ -177,6 +180,18 @@ class LayerFactory:
         pr.addFeatures(features)
         layer.updateExtents()
         
+        # Styling
+        font_marker = QgsFontMarkerSymbolLayer()
+        font_marker.setCharacter('🚏')
+        # Use a common font that supports emoji if possible, or leave default
+        # font_marker.setFontFamily('Segoe UI Emoji') 
+        font_marker.setSize(2.5)
+        font_marker.setColor(QtGui.QColor(0, 0, 0))
+        
+        symbol = QgsMarkerSymbol()
+        symbol.changeSymbolLayer(0, font_marker)
+        layer.setRenderer(QgsSingleSymbolRenderer(symbol))
+
         # Labeling
         label_settings = QgsPalLayerSettings()
         label_settings.fieldName = "name"
@@ -184,5 +199,6 @@ class LayerFactory:
         text_format.setSize(8)
         label_settings.setFormat(text_format)
         layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
+        layer.setDisplayExpression("name")
 
         QgsProject.instance().addMapLayer(layer)

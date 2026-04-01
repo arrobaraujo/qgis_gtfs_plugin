@@ -2,13 +2,13 @@
 
 **English** | [Português](README.pt-BR.md)
 
-[![QGIS Version](https://img.shields.io/badge/QGIS-3.40--4.x-green.svg)](https://qgis.org/) 
-[![Version](https://img.shields.io/badge/version-0.4.9-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
+[![QGIS Version](https://img.shields.io/badge/QGIS-3.40--4.0-green.svg)](https://qgis.org/) 
+[![Version](https://img.shields.io/badge/version-0.4.10-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-red.svg)](LICENSE)
 
-**GTFS 2 GIS - Plugin QGIS (v0.4.9)** is a QGIS plugin designed for visualizing and analyzing public transit networks from GTFS (General Transit Feed Specification) ZIP files.
+**GTFS 2 GIS - Plugin QGIS (v0.4.10)** is a QGIS plugin designed for visualizing and analyzing public transit networks from GTFS (General Transit Feed Specification) ZIP files.
 
-Supported QGIS versions: **3.40 to 4.x**.
+Supported QGIS versions: **3.40 to 4.0**.
 
 ---
 

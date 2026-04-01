@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.9] - 2026-04-01
+- Added QGIS 4 compatibility metadata and set `qgisMaximumVersion=4.99`.
+- Fixed Qt6 dialog execution compatibility by using `exec()` with fallback to `exec_()`.
+- Fixed Qt6 type compatibility in memory layer fields by replacing `QMetaType.*` with `QVariant.*`.
+- Fixed Qt6 enum compatibility for `NoPen`, `RightDockWidgetArea`, dialog button flags, and horizontal orientation.
+- Fixed Qt6 UI loading issue by defining explicit spacer `sizeHint` in `ui/search_panel.ui`.
+- Improved `clear_filters()` robustness for GTFS layers.
+- Updated architecture and README files to document QGIS 3.40-4.x support.
+
 ## [0.4.8] - 2026-04-01
 - Marked plugin as stable for QGIS repository publication (`experimental=False`).
 - Bumped plugin version metadata to `0.4.8`.

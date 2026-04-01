@@ -24,6 +24,26 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         self.btn_frequency_heatmap.clicked.connect(self.run_frequency_heatmap)
         self.btn_real_isochrones.clicked.connect(self.run_real_isochrones)
 
+    @staticmethod
+    def _exec_dialog(dialog: QtWidgets.QDialog) -> int:
+        """Executes a modal dialog in a way that works in Qt5 and Qt6."""
+        if hasattr(dialog, "exec"):
+            return dialog.exec()
+        return dialog.exec_()
+
+    @staticmethod
+    def _horizontal_orientation():
+        """Returns horizontal orientation enum compatible with Qt5 and Qt6."""
+        return getattr(QtCore.Qt, "Horizontal", QtCore.Qt.Orientation.Horizontal)
+
+    @staticmethod
+    def _ok_cancel_buttons():
+        """Returns OK/Cancel button flags compatible with Qt5 and Qt6."""
+        standard_button = getattr(QtWidgets.QDialogButtonBox, "StandardButton", None)
+        if standard_button is not None:
+            return standard_button.Ok | standard_button.Cancel
+        return QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
+
     def update_stats(self, stats: Dict[str, Any]):
         """Updates the dashboard labels with calculated statistics."""
         self.val_total_km.setText(f"{stats.get('total_km', 0):.1f} km")
@@ -70,13 +90,13 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         layout.addWidget(reach_combo)
 
         buttons = QtWidgets.QDialogButtonBox(
-            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
-            QtCore.Qt.Horizontal, dialog)
+            self._ok_cancel_buttons(),
+            self._horizontal_orientation(), dialog)
         buttons.accepted.connect(dialog.accept)
         buttons.rejected.connect(dialog.reject)
         layout.addWidget(buttons)
 
-        if dialog.exec_():
+        if self._exec_dialog(dialog):
             census_layer = layer_combo.currentLayer()
             pop_field = field_combo.currentField()
             walking_layer = reach_combo.currentLayer()
@@ -123,13 +143,13 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         layout.addWidget(reach_combo)
 
         buttons = QtWidgets.QDialogButtonBox(
-            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
-            QtCore.Qt.Horizontal, dialog)
+            self._ok_cancel_buttons(),
+            self._horizontal_orientation(), dialog)
         buttons.accepted.connect(dialog.accept)
         buttons.rejected.connect(dialog.reject)
         layout.addWidget(buttons)
 
-        if dialog.exec_():
+        if self._exec_dialog(dialog):
             census_layer = layer_combo.currentLayer()
             pop_field = field_combo.currentField()
             walking_layer = reach_combo.currentLayer()
@@ -194,13 +214,13 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         layout.addWidget(speed_input)
 
         buttons = QtWidgets.QDialogButtonBox(
-            QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
-            QtCore.Qt.Horizontal, dialog)
+            self._ok_cancel_buttons(),
+            self._horizontal_orientation(), dialog)
         buttons.accepted.connect(dialog.accept)
         buttons.rejected.connect(dialog.reject)
         layout.addWidget(buttons)
 
-        if dialog.exec_():
+        if self._exec_dialog(dialog):
             road_layer = layer_combo.currentLayer()
             walk_time = time_input.value()
             walk_speed = speed_input.value()
@@ -251,7 +271,11 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
 
         layers = QgsProject.instance().mapLayers().values()
         for layer in layers:
-            if layer.name() in ["Stops", "Lines"]:
+            lname = layer.name().lower()
+            layer_fields = {field.name() for field in layer.fields()}
+            is_gtfs_line = "lines" in lname and "start_period" in layer_fields
+            is_gtfs_stop = "stops" in lname and "stop_id" in layer_fields
+            if is_gtfs_line or is_gtfs_stop:
                 layer.setSubsetString('')
 
         self.iface.mapCanvas().refresh()

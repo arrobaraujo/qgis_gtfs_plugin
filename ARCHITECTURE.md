@@ -232,7 +232,7 @@ flowchart LR
 | Layer | Technology |
 |---|---|
 | Runtime | QGIS ≥ 3.40 (Python via PyQGIS) |
-| GUI | PyQt5 (via `qgis.PyQt`) + Qt Designer `.ui` files |
+| GUI | `qgis.PyQt` (Qt5/Qt6, conforme versão do QGIS) + Qt Designer `.ui` files |
 | Geospatial | `QgsDistanceArea` (ellipsoidal), `QgsGeometry`, QGIS Processing Framework |
 | Data Parsing | Python stdlib (`csv`, `zipfile`, `io`) |
 | CI/CD | GitHub Actions + `qgis-plugin-ci` |

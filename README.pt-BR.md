@@ -1,12 +1,14 @@
-# GTFS 2 GIS - Plugin QGIS (v0.4.8)
+# GTFS 2 GIS - Plugin QGIS (v0.4.9)
 
 [English](README.md) | **Português**
 
-[![QGIS Version](https://img.shields.io/badge/QGIS-3.4+-green.svg)](https://qgis.org/) 
-[![Version](https://img.shields.io/badge/version-0.4.8-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
+[![QGIS Version](https://img.shields.io/badge/QGIS-3.40--4.x-green.svg)](https://qgis.org/) 
+[![Version](https://img.shields.io/badge/version-0.4.9-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-red.svg)](LICENSE)
 
 O **GTFS 2 GIS** é um plugin para QGIS desenvolvido para visualização e análise de redes de transporte público a partir de arquivos GTFS (General Transit Feed Specification).
+
+Versões suportadas do QGIS: **3.40 até 4.x**.
 
 ---
 
@@ -44,8 +46,11 @@ O **GTFS 2 GIS** é um plugin para QGIS desenvolvido para visualização e anál
 2. Certifique-se de que o conteúdo do plugin está dentro de uma pasta chamada `qgis_gtfs_plugin`.
 3. Copie a pasta para o diretório de plugins do QGIS:
    - **Windows**: `%APPDATA%\QGIS\QGIS3\profiles\default\python\plugins\`
+    - **Windows (QGIS 4)**: `%APPDATA%\QGIS\QGIS4\profiles\default\python\plugins\`
    - **Linux**: `~/.local/share/QGIS/QGIS3/profiles\default\python\plugins\`
+    - **Linux (QGIS 4)**: `~/.local/share/QGIS/QGIS4/profiles/default/python/plugins/`
    - **macOS**: `~/Library/Application Support/QGIS/QGIS3/profiles/default/python/plugins/`
+    - **macOS (QGIS 4)**: `~/Library/Application Support/QGIS/QGIS4/profiles/default/python/plugins/`
 4. Habilite o plugin no Gerenciador de Plugins.
 
 ---

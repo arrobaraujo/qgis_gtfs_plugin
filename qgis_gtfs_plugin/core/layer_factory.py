@@ -2,6 +2,7 @@
 
 import datetime
 from qgis.PyQt import QtCore, QtGui
+from qgis.PyQt.QtCore import QVariant
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -57,24 +58,23 @@ class LayerFactory:
         layer = QgsVectorLayer("LineString?crs=epsg:4326", "Lines", "memory")
         pr = layer.dataProvider()
 
-        from qgis.PyQt.QtCore import QMetaType
         pr.addAttributes([
-            QgsField("shape_id", QMetaType.QString),
-            QgsField("route_id", QMetaType.QString),
-            QgsField("line", QMetaType.QString),
-            QgsField("name", QMetaType.QString),
-            QgsField("route_desc", QMetaType.QString),
-            QgsField("agency", QMetaType.QString),
-            QgsField("destination", QMetaType.QString),
-            QgsField("direction", QMetaType.QString),
-            QgsField("transit_type", QMetaType.QString),
-            QgsField("fare", QMetaType.QString),
-            QgsField("color", QMetaType.QString),
-            QgsField("frequency", QMetaType.Int),
-            QgsField("shape_ext", QMetaType.Int),
-            QgsField("start_time", QMetaType.QString),
-            QgsField("end_time", QMetaType.QString),
-            QgsField("start_period", QMetaType.QString)
+            QgsField("shape_id", QVariant.String),
+            QgsField("route_id", QVariant.String),
+            QgsField("line", QVariant.String),
+            QgsField("name", QVariant.String),
+            QgsField("route_desc", QVariant.String),
+            QgsField("agency", QVariant.String),
+            QgsField("destination", QVariant.String),
+            QgsField("direction", QVariant.String),
+            QgsField("transit_type", QVariant.String),
+            QgsField("fare", QVariant.String),
+            QgsField("color", QVariant.String),
+            QgsField("frequency", QVariant.Int),
+            QgsField("shape_ext", QVariant.Int),
+            QgsField("start_time", QVariant.String),
+            QgsField("end_time", QVariant.String),
+            QgsField("start_period", QVariant.String)
         ])
         layer.updateFields()
 
@@ -320,23 +320,22 @@ class LayerFactory:
         layer = QgsVectorLayer("Point?crs=epsg:4326", "Stops", "memory")
         pr = layer.dataProvider()
 
-        from qgis.PyQt.QtCore import QMetaType
         pr.addAttributes([
-            QgsField("stop_id", QMetaType.QString),
-            QgsField("name", QMetaType.QString),
-            QgsField("location_type", QMetaType.QString),
-            QgsField("parent_station", QMetaType.QString),
-            QgsField("stop_code", QMetaType.QString),
-            QgsField("platform", QMetaType.QString),
-            QgsField("routes", QMetaType.QString),
-            QgsField("is_terminal", QMetaType.QString),
-            QgsField("terminal_routes", QMetaType.QString),
-            QgsField("stop_desc", QMetaType.QString),
-            QgsField("lat", QMetaType.Double),
-            QgsField("lon", QMetaType.Double),
-            QgsField("lines_count", QMetaType.Int),
-            QgsField("all_transit_types", QMetaType.QString),
-            QgsField("most_frequent_type", QMetaType.Int)
+            QgsField("stop_id", QVariant.String),
+            QgsField("name", QVariant.String),
+            QgsField("location_type", QVariant.String),
+            QgsField("parent_station", QVariant.String),
+            QgsField("stop_code", QVariant.String),
+            QgsField("platform", QVariant.String),
+            QgsField("routes", QVariant.String),
+            QgsField("is_terminal", QVariant.String),
+            QgsField("terminal_routes", QVariant.String),
+            QgsField("stop_desc", QVariant.String),
+            QgsField("lat", QVariant.Double),
+            QgsField("lon", QVariant.Double),
+            QgsField("lines_count", QVariant.Int),
+            QgsField("all_transit_types", QVariant.String),
+            QgsField("most_frequent_type", QVariant.Int)
         ])
         layer.updateFields()
 
@@ -404,7 +403,8 @@ class LayerFactory:
             bg_layer = QgsSimpleMarkerSymbolLayer()
             bg_layer.setShape(QgsSimpleMarkerSymbolLayer.Circle)
             bg_layer.setColor(QtGui.QColor(color))
-            bg_layer.setStrokeStyle(QtCore.Qt.NoPen)
+            no_pen = getattr(QtCore.Qt, "NoPen", QtCore.Qt.PenStyle.NoPen)
+            bg_layer.setStrokeStyle(no_pen)
             bg_layer.setSize(3)
             symbol.changeSymbolLayer(0, bg_layer)
             # 2. Foreground Emoji
@@ -541,8 +541,7 @@ class LayerFactory:
         )
         pr = result_layer.dataProvider()
         fields = pop_layer.fields()
-        from qgis.PyQt.QtCore import QMetaType
-        fields.append(QgsField("pct_covered", QMetaType.Double))
+        fields.append(QgsField("pct_covered", QVariant.Double))
         pr.addAttributes(fields)
         result_layer.updateFields()
 

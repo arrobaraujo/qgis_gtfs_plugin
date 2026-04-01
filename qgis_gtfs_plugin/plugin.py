@@ -48,7 +48,7 @@ class GTFSLoader:
         """Main execution loop of the plugin."""
         dialog = GTFSDialog(self.iface.mainWindow())
 
-        if dialog.exec_():
+        if self._exec_dialog(dialog):
             zip_path = dialog.get_selected_file()
             service_day = dialog.get_service_day()
 
@@ -68,6 +68,18 @@ class GTFSLoader:
                     "Fatal Error",
                     f"Failed to process GTFS: {str(e)}"
                 )
+
+    @staticmethod
+    def _exec_dialog(dialog: QtWidgets.QDialog) -> int:
+        """Executes a modal dialog in a way that works in Qt5 and Qt6."""
+        if hasattr(dialog, "exec"):
+            return dialog.exec()
+        return dialog.exec_()
+
+    @staticmethod
+    def _right_dock_area():
+        """Returns right dock area enum compatible with Qt5 and Qt6."""
+        return getattr(QtCore.Qt, "RightDockWidgetArea", QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
 
     def process_gtfs(self, zip_path: str, service_day: str = 'All'):
         """Coordinates the parsing and layer creation."""
@@ -108,7 +120,7 @@ class GTFSLoader:
         """Creates the search panel but keep it hidden by default."""
         if not self.search_panel:
             self.search_panel = GTFSSearchPanel(self.iface, self.iface.mainWindow())
-            self.iface.addDockWidget(QtCore.Qt.RightDockWidgetArea, self.search_panel)
+            self.iface.addDockWidget(self._right_dock_area(), self.search_panel)
             self.search_panel.setVisible(False)
 
     def toggle_search_panel(self):

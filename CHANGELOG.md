@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.4.8] - 2026-04-01
+- Marked plugin as stable for QGIS repository publication (`experimental=False`).
+- Bumped plugin version metadata to `0.4.8`.
+- Updated English and Portuguese README version badges and headings.
+
 ## [0.4.7] - 2026-03-24
 - Emergency fix: Restored `processor.py` and `search_panel.py` content and finalized PEP8 compliance across all core modules.
 

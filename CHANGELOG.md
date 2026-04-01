@@ -1,8 +1,15 @@
 # Changelog
 
+## [1.0.0] - 2026-04-01
+- First stable `1.0.0` release.
+- Updated plugin metadata version to `1.0.0`.
+- Updated README and README.pt-BR version badges/headings to `1.0.0`.
+- Fixed `QgsField` deprecation warnings by centralizing memory-layer field creation with a modern type path and compatibility fallback.
+
 ## [0.4.10] - 2026-04-01
 - Corrected plugin compatibility policy to cap at `qgisMaximumVersion=4.0`.
 - Updated README and README.pt-BR badges/text to reflect support range `3.40-4.0`.
+- Fixed `QgsField` deprecation warnings by centralizing memory-layer field creation with a modern type path and compatibility fallback.
 
 ## [0.4.9] - 2026-04-01
 - Added QGIS 4 compatibility metadata and set `qgisMaximumVersion=4.99`.

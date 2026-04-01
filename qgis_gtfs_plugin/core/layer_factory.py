@@ -2,7 +2,7 @@
 
 import datetime
 from qgis.PyQt import QtCore, QtGui
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QMetaType, QVariant
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -34,6 +34,36 @@ from qgis.core import (
 from typing import Dict, List, Set, Any, Tuple, Optional
 
 
+def _qmeta_type_from_qvariant(qvariant_type):
+    """Returns a QMetaType enum value compatible with both Qt5/Qt6 APIs."""
+    type_name_by_variant = {
+        QVariant.String: "QString",
+        QVariant.Int: "Int",
+        QVariant.Double: "Double",
+    }
+    type_name = type_name_by_variant.get(qvariant_type)
+    if not type_name:
+        return None
+
+    enum_container = getattr(QMetaType, "Type", None)
+    if enum_container and hasattr(enum_container, type_name):
+        return getattr(enum_container, type_name)
+    if hasattr(QMetaType, type_name):
+        return getattr(QMetaType, type_name)
+    return None
+
+
+def _build_field(name: str, qvariant_type) -> QgsField:
+    """Creates QgsField with a modern type API and a safe backward fallback."""
+    qmeta_type = _qmeta_type_from_qvariant(qvariant_type)
+    if qmeta_type is not None:
+        try:
+            return QgsField(name, qmeta_type)
+        except TypeError:
+            pass
+    return QgsField(name, qvariant_type)
+
+
 class LayerFactory:
     """Handles the creation and styling of QGIS layers from processed GTFS data."""
 
@@ -59,22 +89,22 @@ class LayerFactory:
         pr = layer.dataProvider()
 
         pr.addAttributes([
-            QgsField("shape_id", QVariant.String),
-            QgsField("route_id", QVariant.String),
-            QgsField("line", QVariant.String),
-            QgsField("name", QVariant.String),
-            QgsField("route_desc", QVariant.String),
-            QgsField("agency", QVariant.String),
-            QgsField("destination", QVariant.String),
-            QgsField("direction", QVariant.String),
-            QgsField("transit_type", QVariant.String),
-            QgsField("fare", QVariant.String),
-            QgsField("color", QVariant.String),
-            QgsField("frequency", QVariant.Int),
-            QgsField("shape_ext", QVariant.Int),
-            QgsField("start_time", QVariant.String),
-            QgsField("end_time", QVariant.String),
-            QgsField("start_period", QVariant.String)
+            _build_field("shape_id", QVariant.String),
+            _build_field("route_id", QVariant.String),
+            _build_field("line", QVariant.String),
+            _build_field("name", QVariant.String),
+            _build_field("route_desc", QVariant.String),
+            _build_field("agency", QVariant.String),
+            _build_field("destination", QVariant.String),
+            _build_field("direction", QVariant.String),
+            _build_field("transit_type", QVariant.String),
+            _build_field("fare", QVariant.String),
+            _build_field("color", QVariant.String),
+            _build_field("frequency", QVariant.Int),
+            _build_field("shape_ext", QVariant.Int),
+            _build_field("start_time", QVariant.String),
+            _build_field("end_time", QVariant.String),
+            _build_field("start_period", QVariant.String)
         ])
         layer.updateFields()
 
@@ -321,21 +351,21 @@ class LayerFactory:
         pr = layer.dataProvider()
 
         pr.addAttributes([
-            QgsField("stop_id", QVariant.String),
-            QgsField("name", QVariant.String),
-            QgsField("location_type", QVariant.String),
-            QgsField("parent_station", QVariant.String),
-            QgsField("stop_code", QVariant.String),
-            QgsField("platform", QVariant.String),
-            QgsField("routes", QVariant.String),
-            QgsField("is_terminal", QVariant.String),
-            QgsField("terminal_routes", QVariant.String),
-            QgsField("stop_desc", QVariant.String),
-            QgsField("lat", QVariant.Double),
-            QgsField("lon", QVariant.Double),
-            QgsField("lines_count", QVariant.Int),
-            QgsField("all_transit_types", QVariant.String),
-            QgsField("most_frequent_type", QVariant.Int)
+            _build_field("stop_id", QVariant.String),
+            _build_field("name", QVariant.String),
+            _build_field("location_type", QVariant.String),
+            _build_field("parent_station", QVariant.String),
+            _build_field("stop_code", QVariant.String),
+            _build_field("platform", QVariant.String),
+            _build_field("routes", QVariant.String),
+            _build_field("is_terminal", QVariant.String),
+            _build_field("terminal_routes", QVariant.String),
+            _build_field("stop_desc", QVariant.String),
+            _build_field("lat", QVariant.Double),
+            _build_field("lon", QVariant.Double),
+            _build_field("lines_count", QVariant.Int),
+            _build_field("all_transit_types", QVariant.String),
+            _build_field("most_frequent_type", QVariant.Int)
         ])
         layer.updateFields()
 
@@ -541,7 +571,7 @@ class LayerFactory:
         )
         pr = result_layer.dataProvider()
         fields = pop_layer.fields()
-        fields.append(QgsField("pct_covered", QVariant.Double))
+        fields.append(_build_field("pct_covered", QVariant.Double))
         pr.addAttributes(fields)
         result_layer.updateFields()
 

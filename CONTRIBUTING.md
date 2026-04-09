@@ -43,7 +43,7 @@ There are many ways to contribute:
 
 ### Prerequisites
 
-- **QGIS 3.40+** installed ([download](https://qgis.org/download/))
+- **QGIS 3.44+** installed ([download](https://qgis.org/download/))
 - **Python 3.10+** (bundled with QGIS)
 - **Git**
 
@@ -206,7 +206,7 @@ Use the [Conventional Commits](https://www.conventionalcommits.org/) specificati
 ```
 feat(processor): add support for frequencies.txt parsing
 fix(layer_factory): correct symbol layer ordering for high-frequency routes
-docs(readme): update installation instructions for QGIS 3.40
+docs(readme): update installation instructions for QGIS 3.44
 style(processor): resolve remaining PEP8 violations
 ci(publish): fix OSGEO credential injection in workflow
 ```
@@ -244,7 +244,7 @@ ci(publish): fix OSGEO credential injection in workflow
 ### PR Checklist
 
 - [ ] Code follows PEP 8
-- [ ] Plugin loads without errors in QGIS ≥ 3.40
+- [ ] Plugin loads without errors in QGIS ≥ 3.44
 - [ ] GTFS loading and layer creation still work
 - [ ] New features are documented
 - [ ] `CHANGELOG.md` is updated

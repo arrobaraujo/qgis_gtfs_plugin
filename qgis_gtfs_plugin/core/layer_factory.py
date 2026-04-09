@@ -9,7 +9,6 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsPointXY,
-    QgsField,
     QgsPalLayerSettings,
     QgsVectorLayerSimpleLabeling,
     QgsTextFormat,
@@ -33,10 +32,6 @@ from qgis.core import (
 )
 from typing import Dict, List, Set, Any, Tuple, Optional
 from .utils import build_field
-
-
-
-
 
 class LayerFactory:
     """Handles the creation and styling of QGIS layers from processed GTFS data."""

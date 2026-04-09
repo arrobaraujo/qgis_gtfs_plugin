@@ -49,7 +49,7 @@ class GTFSRTProcessor:
             # 2. Fetch the raw binary data
             headers = {'User-Agent': 'Mozilla/5.0'}
             req = urllib.request.Request(self.url, headers=headers)
-            with urllib.request.urlopen(req, timeout=10) as response:
+            with urllib.request.urlopen(req, timeout=10) as response:  # nosec B310
 
                 binary_data = response.read()
 

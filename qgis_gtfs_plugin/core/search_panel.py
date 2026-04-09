@@ -335,8 +335,6 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         interval = self.spin_rt_interval.value()
 
         if not self.rt_manager:
-            # Re-import here to ensure it's in scope if HAS_PROTOBUF is True
-            from .rt_manager import RTManager
             self.rt_manager = RTManager(self.iface, url, interval)
             self.rt_manager.status_changed.connect(self.update_rt_status)
         else:

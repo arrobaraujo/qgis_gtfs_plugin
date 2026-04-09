@@ -5,7 +5,7 @@ from datetime import datetime
 from qgis.PyQt import QtCore
 from qgis.core import (
     QgsProject, QgsVectorLayer, QgsFeature, QgsGeometry,
-    QgsPointXY, QgsField, QgsMessageLog, Qgis
+    QgsPointXY, QgsMessageLog, Qgis
 )
 from .rt_processor import GTFSRTProcessor
 from .layer_factory import LayerFactory

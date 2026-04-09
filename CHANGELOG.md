@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2026-04-09
+### Added
+- **Default GTFS-RT URL**: Set default feed link for Belo Horizonte (Mobilibus).
+### Improved
+- **Directional Vehicle Icons**: Replaced generic bus icons with bearing-based triangle indicators for clearer real-time visualization.
+
 ## [1.1.0] - 2026-04-09
 ### Added
 - **GTFS-Realtime Tracking**: Integrate Google Protobuf feeds for live vehicle visualization.

@@ -3,10 +3,10 @@
 **English** | [Português](README.pt-BR.md)
 
 [![QGIS Version](https://img.shields.io/badge/QGIS-3.40--4.0-green.svg)](https://qgis.org/) 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
+[![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-red.svg)](LICENSE)
 
-**GTFS 2 GIS - Plugin QGIS (v1.1.0)** is a QGIS plugin designed for visualizing and analyzing public transit networks from static GTFS ZIP files and live GTFS-Realtime feeds.
+**GTFS 2 GIS - Plugin QGIS (v1.1.1)** is a QGIS plugin designed for visualizing and analyzing public transit networks from static GTFS ZIP files and live GTFS-Realtime feeds.
 
 Supported QGIS versions: **3.44 to 4.0**.
 
@@ -68,7 +68,7 @@ Supported QGIS versions: **3.44 to 4.0**.
 4. Open the **GTFS Analytics** panel (`F7` or via Toolbar).
 5. In the **Real-Time Tracking** section:
     - If needed, click **Install Dependencies** to set up Protobuf in your QGIS environment.
-    - Enter a GTFS-RT URL.
+    - Enter a GTFS-RT URL (e.g., Belo Horizonte: `http://realtime4.mobilibus.com/web/4ch6j/vehicle-positions?accesskey=982a57efd77a9462bf1665696fb25984`).
     - Click **Start Tracking** to load live vehicles onto the map.
 
 ---

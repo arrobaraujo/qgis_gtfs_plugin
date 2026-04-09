@@ -717,11 +717,12 @@ class LayerFactory:
         bg_layer.setSize(4)
         symbol.changeSymbolLayer(0, bg_layer)
         
-        # 2. Foreground Bus Icon (White)
+        # 2. Foreground Directional Indicator (White Triangle)
         fg_layer = QgsFontMarkerSymbolLayer()
-        fg_layer.setCharacter('🚌')
+        fg_layer.setFontFamily('Arial')
+        fg_layer.setCharacter('▲')
         fg_layer.setColor(QtGui.QColor(255, 255, 255))
-        fg_layer.setSize(3)
+        fg_layer.setSize(2.5)
         symbol.appendSymbolLayer(fg_layer)
         
         # Data-defined rotation based on 'bearing'

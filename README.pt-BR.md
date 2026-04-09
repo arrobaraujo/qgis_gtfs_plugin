@@ -8,7 +8,7 @@
 
 O **GTFS 2 GIS** é um plugin para QGIS desenvolvido para visualização e análise de redes de transporte público a partir de arquivos GTFS estáticos e feeds dinâmicos de GTFS-Realtime.
 
-Versões suportadas do QGIS: **3.40 até 4.0**.
+Versões suportadas do QGIS: **3.44 até 4.0**.
 
 ---
 
@@ -68,7 +68,7 @@ Versões suportadas do QGIS: **3.40 até 4.0**.
 4. Abra o painel **GTFS Analytics** (`F7` ou pela Barra de Ferramentas).
 5. Na seção **Real-Time Tracking**:
     - Se necessário, clique em **Install Dependencies** para configurar o Protobuf.
-    - Insira a URL do feed GTFS-RT (ex: Rio: `http://dados.mobilidade.rio/gtfs/realtime`).
+    - Insira a URL do feed GTFS-RT.
     - Clique em **Start Tracking** para visualizar os veículos no mapa.
 
 ---

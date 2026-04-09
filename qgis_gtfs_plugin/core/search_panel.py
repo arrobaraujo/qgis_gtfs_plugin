@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
+from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox
+from qgis.core import QgsProject, QgsMapLayerProxyModel
+from qgis.PyQt import uic, QtWidgets, QtCore
+from typing import Dict, Any
 import os
-# Force pure-Python implementation to avoid "Descriptors cannot be created directly" error in newer protobuf versions
+# Force pure-Python implementation to avoid "Descriptors cannot be created
+# directly" error in newer protobuf versions
 os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 
-from typing import Dict, Any
-from qgis.PyQt import uic, QtWidgets, QtCore
-from qgis.core import QgsProject, QgsMapLayerProxyModel
-from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox
-from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox
 # from .rt_manager import RTManager  <-- Moved to lazy import
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -39,7 +39,8 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         self.check_rt_dependencies()
 
         # Set default GTFS-RT URL
-        self.txt_rt_url.setText("http://realtime4.mobilibus.com/web/4ch6j/vehicle-positions?accesskey=982a57efd77a9462bf1665696fb25984")
+        self.txt_rt_url.setText(
+            "http://realtime4.mobilibus.com/web/4ch6j/vehicle-positions?accesskey=982a57efd77a9462bf1665696fb25984")
 
     @staticmethod
     def _exec_dialog(dialog: QtWidgets.QDialog) -> int:
@@ -51,12 +52,18 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
     @staticmethod
     def _horizontal_orientation():
         """Returns horizontal orientation enum compatible with Qt5 and Qt6."""
-        return getattr(QtCore.Qt, "Horizontal", QtCore.Qt.Orientation.Horizontal)
+        return getattr(
+            QtCore.Qt,
+            "Horizontal",
+            QtCore.Qt.Orientation.Horizontal)
 
     @staticmethod
     def _ok_cancel_buttons():
         """Returns OK/Cancel button flags compatible with Qt5 and Qt6."""
-        standard_button = getattr(QtWidgets.QDialogButtonBox, "StandardButton", None)
+        standard_button = getattr(
+            QtWidgets.QDialogButtonBox,
+            "StandardButton",
+            None)
         if standard_button is not None:
             return standard_button.Ok | standard_button.Cancel
         return QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel
@@ -64,7 +71,8 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
     def update_stats(self, stats: Dict[str, Any]):
         """Updates the dashboard labels with calculated statistics."""
         self.val_total_km.setText(f"{stats.get('total_km', 0):.1f} km")
-        self.val_stop_density.setText(f"{stats.get('stop_density', 0):.2f} /km²")
+        self.val_stop_density.setText(
+            f"{stats.get('stop_density', 0):.2f} /km²")
         self.val_routes.setText(str(stats.get('routes_count', 0)))
 
         # New stats
@@ -77,7 +85,8 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         # Agency Fleet
         self.list_agency_fleet.clear()
         agency_trips = stats.get('agency_trips', {})
-        for agency, trips in sorted(agency_trips.items(), key=lambda x: x[1], reverse=True):
+        for agency, trips in sorted(
+                agency_trips.items(), key=lambda x: x[1], reverse=True):
             self.list_agency_fleet.addItem(f"{agency}: {trips} trips")
 
     def run_population_analysis(self):
@@ -97,7 +106,8 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         layout.addWidget(field_combo)
         layer_combo.layerChanged.connect(field_combo.setLayer)
 
-        layout.addWidget(QtWidgets.QLabel("Select Reach Layer (Walking/Network):"))
+        layout.addWidget(QtWidgets.QLabel(
+            "Select Reach Layer (Walking/Network):"))
         reach_combo = QgsMapLayerComboBox(dialog)
         reach_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         for layer in QgsProject.instance().mapLayers().values():
@@ -150,7 +160,8 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         layout.addWidget(field_combo)
         layer_combo.layerChanged.connect(field_combo.setLayer)
 
-        layout.addWidget(QtWidgets.QLabel("Select Reach Layer (Walking/Network):"))
+        layout.addWidget(QtWidgets.QLabel(
+            "Select Reach Layer (Walking/Network):"))
         reach_combo = QgsMapLayerComboBox(dialog)
         reach_combo.setFilters(QgsMapLayerProxyModel.VectorLayer)
         for layer in QgsProject.instance().mapLayers().values():
@@ -199,12 +210,14 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
                 break
 
         if not lines_layer:
-            QtWidgets.QMessageBox.warning(self, "Error", "Lines layer not found. Load a GTFS first.")
+            QtWidgets.QMessageBox.warning(
+                self, "Error", "Lines layer not found. Load a GTFS first.")
             return
 
         from .layer_factory import LayerFactory
         LayerFactory.create_frequency_heatmap_layer(lines_layer)
-        QtWidgets.QMessageBox.information(self, "Success", "Layer 'lines - heatmap' created.")
+        QtWidgets.QMessageBox.information(
+            self, "Success", "Layer 'lines - heatmap' created.")
 
     def run_real_isochrones(self):
         """Opens a dialog to select a road layer and walking time, then generates network reach."""
@@ -255,12 +268,15 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
                     break
 
             if not stops_layer:
-                QtWidgets.QMessageBox.warning(self, "Error", "Stops layer not found.")
+                QtWidgets.QMessageBox.warning(
+                    self, "Error", "Stops layer not found.")
                 return
 
             from .layer_factory import LayerFactory
-            LayerFactory.create_network_isochrones(road_layer, stops_layer, distance)
-            QtWidgets.QMessageBox.information(self, "Success", f"Network reach layer created for {walk_time} min walk.")
+            LayerFactory.create_network_isochrones(
+                road_layer, stops_layer, distance)
+            QtWidgets.QMessageBox.information(
+                self, "Success", f"Network reach layer created for {walk_time} min walk.")
 
     def apply_filters(self):
         """Applies filters to the visible layers."""
@@ -312,20 +328,23 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
 
         url = self.txt_rt_url.text().strip()
         if not url:
-            QtWidgets.QMessageBox.warning(self, "Error", "Please enter a valid GTFS-RT URL.")
+            QtWidgets.QMessageBox.warning(
+                self, "Error", "Please enter a valid GTFS-RT URL.")
             return
 
         interval = self.spin_rt_interval.value()
-        
+
         if not self.rt_manager:
             # Re-import here to ensure it's in scope if HAS_PROTOBUF is True
             from .rt_manager import RTManager
             self.rt_manager = RTManager(self.iface, url, interval)
             self.rt_manager.status_changed.connect(self.update_rt_status)
-            
+        else:
+            self.rt_manager.set_url(url)
+
         self.rt_manager.interval = interval
         self.rt_manager.start()
-        
+
         self.btn_start_rt.setEnabled(False)
         self.btn_stop_rt.setEnabled(True)
         self.lbl_rt_status.setStyleSheet("font-weight: bold; color: green;")
@@ -334,7 +353,7 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         """Stops the real-time tracker."""
         if self.rt_manager:
             self.rt_manager.stop()
-            
+
         self.btn_start_rt.setEnabled(True)
         self.btn_stop_rt.setEnabled(False)
         self.lbl_rt_status.setStyleSheet("font-weight: bold; color: gray;")
@@ -349,7 +368,7 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
             from .rt_processor import HAS_PROTOBUF
         except ImportError:
             HAS_PROTOBUF = False
-        
+
         self.btn_install_deps.setVisible(not HAS_PROTOBUF)
 
     def install_dependencies(self):
@@ -357,12 +376,12 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
         self.lbl_rt_status.setText("Status: Installing dependencies...")
         self.lbl_rt_status.setStyleSheet("font-weight: bold; color: blue;")
         QtWidgets.QApplication.processEvents()
-        
+
         try:
             import sys
             import os
             import subprocess
-            
+
             # 1. Identify the correct Python executable
             # If sys.executable is the QGIS binary (e.g., qgis-bin.exe), it will try to open args as layers.
             # We must find the companion python.exe.
@@ -375,7 +394,7 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
                     if os.path.exists(path):
                         py_exe = path
                         break
-            
+
             # 2. Run installation
             # Using CREATE_NO_WINDOW (0x08000000) on Windows to keep it silent
             creation_flags = 0
@@ -386,19 +405,20 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
                 [py_exe, "-m", "pip", "install", "protobuf"],
                 creationflags=creation_flags
             )
-            
+
             QtWidgets.QMessageBox.information(
-                self, "Success", 
+                self, "Success",
                 "Dependencies installed successfully!\n"
                 "Please restart QGIS to apply changes correctly."
             )
             self.check_rt_dependencies()
             self.lbl_rt_status.setText("Status: Restart Required")
-            self.lbl_rt_status.setStyleSheet("font-weight: bold; color: orange;")
-            
+            self.lbl_rt_status.setStyleSheet(
+                "font-weight: bold; color: orange;")
+
         except Exception as e:
             QtWidgets.QMessageBox.critical(
-                self, "Installation Failed", 
+                self, "Installation Failed",
                 f"Failed to install 'protobuf' using {py_exe}\n\n"
                 f"Error: {str(e)}\n\n"
                 "Please try manual installation via 'OSGeo4W Shell' if available."

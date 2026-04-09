@@ -43,3 +43,5 @@ htmlcov/
 # Local Environment / Zip archives
 .env
 *.zip
+
+.kilocode/

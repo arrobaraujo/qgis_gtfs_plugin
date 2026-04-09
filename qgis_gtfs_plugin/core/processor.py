@@ -47,16 +47,21 @@ class GTFSProcessor:
     def _parse_agency(self, z, files):
         if 'agency.txt' in files:
             with z.open('agency.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
                     aid = row.get('agency_id', 'default')
-                    name = row.get('agency_name') or row.get('agency_id') or aid
+                    name = row.get('agency_name') or row.get(
+                        'agency_id') or aid
                     self.agencies[aid] = {'name': name}
 
     def _parse_calendar(self, z, files):
         if 'calendar.txt' in files:
             with z.open('calendar.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
                     sid = row['service_id']
                     days = []
@@ -79,7 +84,9 @@ class GTFSProcessor:
     def _parse_routes(self, z, files):
         if 'routes.txt' in files:
             with z.open('routes.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
                     rid = row.get('route_id')
                     if not rid:
@@ -96,12 +103,16 @@ class GTFSProcessor:
     def _parse_fares(self, z, files):
         if 'fare_attributes.txt' in files:
             with z.open('fare_attributes.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
                     self.fares[row['fare_id']] = row.get('price', '0.00')
         if 'fare_rules.txt' in files:
             with z.open('fare_rules.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
                     rid = row['route_id']
                     fid = row['fare_id']
@@ -111,12 +122,15 @@ class GTFSProcessor:
     def _parse_trips(self, z, files, service_day='All'):
         if 'trips.txt' in files:
             with z.open('trips.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
                     sid = row['service_id']
                     if service_day != 'All':
                         days = self.service_to_days.get(sid, [])
-                        if service_day == 'Weekday' and not any(d < 5 for d in days):
+                        if service_day == 'Weekday' and not any(
+                                d < 5 for d in days):
                             continue
                         if service_day == 'Saturday' and 5 not in days:
                             continue
@@ -132,12 +146,15 @@ class GTFSProcessor:
                     })
                     shape_id = row.get('shape_id', '')
                     if shape_id:
-                        self.shape_frequencies[shape_id] = self.shape_frequencies.get(shape_id, 0) + 1
+                        self.shape_frequencies[shape_id] = self.shape_frequencies.get(
+                            shape_id, 0) + 1
 
     def _parse_shapes(self, z, files):
         if 'shapes.txt' in files:
             with z.open('shapes.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
                     sid = row['shape_id']
                     if sid not in self.shapes:
@@ -154,14 +171,17 @@ class GTFSProcessor:
                 dist = 0
                 for i in range(len(sorted_pts) - 1):
                     p1 = QgsPointXY(sorted_pts[i]['lon'], sorted_pts[i]['lat'])
-                    p2 = QgsPointXY(sorted_pts[i + 1]['lon'], sorted_pts[i + 1]['lat'])
+                    p2 = QgsPointXY(
+                        sorted_pts[i + 1]['lon'], sorted_pts[i + 1]['lat'])
                     dist += da.measureLine(p1, p2)
                 self.shape_lengths[sid] = dist / 1000.0
 
     def _parse_stops(self, z, files):
         if 'stops.txt' in files:
             with z.open('stops.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
                     sid = row.get('stop_id')
                     if not sid:
@@ -187,10 +207,15 @@ class GTFSProcessor:
         trip_to_shape = {t['trip_id']: t['shape_id'] for t in self.trips}
         if 'stop_times.txt' in files:
             with z.open('stop_times.txt') as f:
-                reader = csv.DictReader(io.TextIOWrapper(f, encoding='utf-8-sig'))
+                reader = csv.DictReader(
+                    io.TextIOWrapper(
+                        f, encoding='utf-8-sig'))
                 for row in reader:
-                    tid, sid, seq = row['trip_id'], row['stop_id'], int(row['stop_sequence'])
-                    arr, dep = row.get('arrival_time', ''), row.get('departure_time', '')
+                    tid, sid, seq = row['trip_id'], row['stop_id'], int(
+                        row['stop_sequence'])
+                    arr, dep = row.get(
+                        'arrival_time', ''), row.get(
+                        'departure_time', '')
                     if tid not in trip_times:
                         trip_times[tid] = []
                     if arr:
@@ -217,7 +242,8 @@ class GTFSProcessor:
                         self.shape_time_ranges[sid] = (min(times), max(times))
                     else:
                         cmin, cmax = self.shape_time_ranges[sid]
-                        self.shape_time_ranges[sid] = (min(cmin, min(times)), max(cmax, max(times)))
+                        self.shape_time_ranges[sid] = (
+                            min(cmin, min(times)), max(cmax, max(times)))
             for sid, rids in self.stop_to_routes.items():
                 self.stop_route_counts[sid] = len(rids)
             for tid, (sid, _) in trip_last_stop.items():
@@ -228,7 +254,8 @@ class GTFSProcessor:
                     self.stop_to_pf_routes[sid].add(rid)
 
     def get_stats(self) -> Dict[str, Any]:
-        total_km = sum(self.shape_lengths.get(sid, 0) * freq for sid, freq in self.shape_frequencies.items())
+        total_km = sum(self.shape_lengths.get(sid, 0)
+                       * freq for sid, freq in self.shape_frequencies.items())
         agency_trips = {}
         agencies_found = set()
         for trip in self.trips:
@@ -237,10 +264,13 @@ class GTFSProcessor:
             aname = self.agencies.get(aid, {}).get('name', aid)
             agency_trips[aname] = agency_trips.get(aname, 0) + 1
             agencies_found.add(aid)
-        avg_len = sum(self.shape_lengths.values()) / len(self.shape_lengths) if self.shape_lengths else 0
+        avg_len = sum(self.shape_lengths.values()) / \
+            len(self.shape_lengths) if self.shape_lengths else 0
         area_km2 = 0
         if self.stops:
-            lats, lons = [s['lat'] for s in self.stops.values()], [s['lon'] for s in self.stops.values()]
+            lats, lons = [
+                s['lat'] for s in self.stops.values()], [
+                s['lon'] for s in self.stops.values()]
             rect = QgsRectangle(min(lons), min(lats), max(lons), max(lats))
             da = QgsDistanceArea()
             da.setEllipsoid('WGS84')

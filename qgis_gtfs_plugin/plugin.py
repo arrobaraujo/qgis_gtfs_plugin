@@ -79,7 +79,10 @@ class GTFSLoader:
     @staticmethod
     def _right_dock_area():
         """Returns right dock area enum compatible with Qt5 and Qt6."""
-        return getattr(QtCore.Qt, "RightDockWidgetArea", QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
+        return getattr(
+            QtCore.Qt,
+            "RightDockWidgetArea",
+            QtCore.Qt.DockWidgetArea.RightDockWidgetArea)
 
     def process_gtfs(self, zip_path: str, service_day: str = 'All'):
         """Coordinates the parsing and layer creation."""
@@ -119,8 +122,10 @@ class GTFSLoader:
     def initialize_search_panel(self):
         """Creates the search panel but keep it hidden by default."""
         if not self.search_panel:
-            self.search_panel = GTFSSearchPanel(self.iface, self.iface.mainWindow())
-            self.iface.addDockWidget(self._right_dock_area(), self.search_panel)
+            self.search_panel = GTFSSearchPanel(
+                self.iface, self.iface.mainWindow())
+            self.iface.addDockWidget(
+                self._right_dock_area(), self.search_panel)
             self.search_panel.setVisible(False)
 
     def toggle_search_panel(self):

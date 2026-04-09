@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.2] - 2026-04-09
+### Fixed
+- **QgsField Deprecation**: Resolved numerous warnings by centralizing field creation in `core/utils.py` with modern `QMetaType` and backward compatibility.
+- **Protobuf Warnings**: Silenced deprecation warnings from legacy generated Protobuf code.
+- **RT Manager Robustness**: Fixed a bug where switching feeds (URLs) in the UI did not update the tracker.
+- **Layer Recovery**: Added auto-recovery for the real-time layer; the plugin now automatically recreates the layer if it was deleted by the user.
+### Security
+- **URL Validation**: Implemented strict scheme validation for GTFS-RT URLs (allowing only `http` and `https`) to prevent Local File Inclusion (B310).
+### Improved
+- **Code Quality**: Resolved 54+ PEP 8 violations across core modules for better maintainability and professional standards.
+
 ## [1.1.1] - 2026-04-09
 ### Added
 - **Default GTFS-RT URL**: Set default feed link for Belo Horizonte (Mobilibus).

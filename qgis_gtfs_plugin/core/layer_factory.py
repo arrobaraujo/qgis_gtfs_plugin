@@ -2,7 +2,7 @@
 
 import datetime
 from qgis.PyQt import QtCore, QtGui
-from qgis.PyQt.QtCore import QMetaType, QVariant
+from qgis.PyQt.QtCore import QVariant
 from qgis.core import (
     QgsProject,
     QgsVectorLayer,
@@ -32,36 +32,10 @@ from qgis.core import (
     QgsCoordinateTransform
 )
 from typing import Dict, List, Set, Any, Tuple, Optional
+from .utils import build_field
 
 
-def _qmeta_type_from_qvariant(qvariant_type):
-    """Returns a QMetaType enum value compatible with both Qt5/Qt6 APIs."""
-    type_name_by_variant = {
-        QVariant.String: "QString",
-        QVariant.Int: "Int",
-        QVariant.Double: "Double",
-    }
-    type_name = type_name_by_variant.get(qvariant_type)
-    if not type_name:
-        return None
 
-    enum_container = getattr(QMetaType, "Type", None)
-    if enum_container and hasattr(enum_container, type_name):
-        return getattr(enum_container, type_name)
-    if hasattr(QMetaType, type_name):
-        return getattr(QMetaType, type_name)
-    return None
-
-
-def _build_field(name: str, qvariant_type) -> QgsField:
-    """Creates QgsField with a modern type API and a safe backward fallback."""
-    qmeta_type = _qmeta_type_from_qvariant(qvariant_type)
-    if qmeta_type is not None:
-        try:
-            return QgsField(name, qmeta_type)
-        except TypeError:
-            pass
-    return QgsField(name, qvariant_type)
 
 
 class LayerFactory:
@@ -89,22 +63,22 @@ class LayerFactory:
         pr = layer.dataProvider()
 
         pr.addAttributes([
-            _build_field("shape_id", QVariant.String),
-            _build_field("route_id", QVariant.String),
-            _build_field("line", QVariant.String),
-            _build_field("name", QVariant.String),
-            _build_field("route_desc", QVariant.String),
-            _build_field("agency", QVariant.String),
-            _build_field("destination", QVariant.String),
-            _build_field("direction", QVariant.String),
-            _build_field("transit_type", QVariant.String),
-            _build_field("fare", QVariant.String),
-            _build_field("color", QVariant.String),
-            _build_field("frequency", QVariant.Int),
-            _build_field("shape_ext", QVariant.Int),
-            _build_field("start_time", QVariant.String),
-            _build_field("end_time", QVariant.String),
-            _build_field("start_period", QVariant.String)
+            build_field("shape_id", QVariant.String),
+            build_field("route_id", QVariant.String),
+            build_field("line", QVariant.String),
+            build_field("name", QVariant.String),
+            build_field("route_desc", QVariant.String),
+            build_field("agency", QVariant.String),
+            build_field("destination", QVariant.String),
+            build_field("direction", QVariant.String),
+            build_field("transit_type", QVariant.String),
+            build_field("fare", QVariant.String),
+            build_field("color", QVariant.String),
+            build_field("frequency", QVariant.Int),
+            build_field("shape_ext", QVariant.Int),
+            build_field("start_time", QVariant.String),
+            build_field("end_time", QVariant.String),
+            build_field("start_period", QVariant.String)
         ])
         layer.updateFields()
 
@@ -116,7 +90,8 @@ class LayerFactory:
 
         features = []
         for sid, points in shapes.items():
-            trip = shape_to_trip.get(sid, {'route_id': '', 'headsign': '', 'short_name': '', 'direction': ''})
+            trip = shape_to_trip.get(
+                sid, {'route_id': '', 'headsign': '', 'short_name': '', 'direction': ''})
 
             sorted_pts = sorted(points, key=lambda x: x['seq'])
             qgs_points = [QgsPointXY(p['lon'], p['lat']) for p in sorted_pts]
@@ -132,7 +107,9 @@ class LayerFactory:
 
             route_id = trip['route_id']
             route_info = routes.get(route_id, {})
-            route_name = route_info.get('short_name', '') or route_info.get('long_name', '')
+            route_name = route_info.get(
+                'short_name', '') or route_info.get(
+                'long_name', '')
             route_long_name = route_info.get('long_name', '')
             route_desc = route_info.get('desc', '')
             agency_id = route_info.get('agency_id', '')
@@ -148,12 +125,17 @@ class LayerFactory:
             if not color.startswith('#'):
                 color = '#' + color
 
-            trip_name = trip.get('headsign', '') or trip.get('short_name', '') or ''
+            trip_name = trip.get(
+                'headsign',
+                '') or trip.get(
+                'short_name',
+                '') or ''
 
             time_range = shape_time_ranges.get(sid, ('00:00:00', '23:59:59'))
 
             def format_gtfs_time(t_str):
-                # Simple conversion for temporal controller (using today as base date)
+                # Simple conversion for temporal controller (using today as
+                # base date)
                 try:
                     h, m, s = map(int, t_str.split(':'))
                     base = datetime.date.today()
@@ -202,16 +184,21 @@ class LayerFactory:
         if symbol:
             for i in range(symbol.symbolLayerCount()):
                 sl = symbol.symbolLayer(i)
-                sl.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeColor, QgsProperty.fromField("color"))
+                sl.setDataDefinedProperty(
+                    QgsSymbolLayer.PropertyStrokeColor,
+                    QgsProperty.fromField("color"))
                 # Base width 0.4, grows with frequency up to 2.5
-                sl.setDataDefinedProperty(QgsSymbolLayer.PropertyStrokeWidth,
-                                          QgsProperty.fromExpression('scale_linear("frequency", 1, 100, 0.4, 2.5)'))
+                sl.setDataDefinedProperty(
+                    QgsSymbolLayer.PropertyStrokeWidth,
+                    QgsProperty.fromExpression('scale_linear("frequency", 1, 100, 0.4, 2.5)'))
 
         # Rendering Order: Thicker lines (higher frequency) at the bottom
         # QGIS renders from first to last, so we want high frequency first.
-        # Set feature rendering order (high frequency/thicker lines at the bottom)
+        # Set feature rendering order (high frequency/thicker lines at the
+        # bottom)
         renderer = layer.renderer()
-        clause = QgsFeatureRequest.OrderByClause("frequency", False)  # Descending = drawn first = at bottom
+        clause = QgsFeatureRequest.OrderByClause(
+            "frequency", False)  # Descending = drawn first = at bottom
         renderer.setOrderBy(QgsFeatureRequest.OrderBy([clause]))
         renderer.setOrderByEnabled(True)
 
@@ -303,21 +290,30 @@ class LayerFactory:
             'OUTPUT': 'memory:ServiceArea'
         }
         # Try to find the correct algorithm ID dynamically
-        all_algs = [alg.id() for alg in QgsApplication.processingRegistry().algorithms()]
-        target_alg = next((a for a in all_algs if "servicearea" in a.lower() and "layer" in a.lower()), None)
+        all_algs = [alg.id()
+                    for alg in QgsApplication.processingRegistry().algorithms()]
+        target_alg = next(
+            (a for a in all_algs if "servicearea" in a.lower() and "layer" in a.lower()),
+            None)
 
         if not target_alg:
             # Last ditch effort: fallback search
-            possible_ids = ["native:servicearea_fromlayer", "qgis:servicearea_fromlayer", "native:serviceareafrompoints"]
+            possible_ids = [
+                "native:servicearea_fromlayer",
+                "qgis:servicearea_fromlayer",
+                "native:serviceareafrompoints"]
             target_alg = next((a for a in possible_ids if a in all_algs), None)
 
         if not target_alg:
-            raise Exception("No service area algorithm found in QGIS. Please check your Network Analysis provider.")
+            raise Exception(
+                "No service area algorithm found in QGIS. Please check your Network Analysis provider.")
 
         try:
             result = processing.run(target_alg, params)
         except Exception as e:
-            QgsMessageLog.logMessage(f"Service Area Failed with {target_alg}. Error: {str(e)}", "GTFS Plugin", Qgis.Critical)
+            QgsMessageLog.logMessage(
+                f"Service Area Failed with {target_alg}. Error: {
+                    str(e)}", "GTFS Plugin", Qgis.Critical)
             raise e
 
         output_layer = result['OUTPUT']
@@ -331,7 +327,8 @@ class LayerFactory:
             node.setItemVisibilityChecked(False)
 
         # Simple styling: Red lines
-        symbol = QgsLineSymbol.createSimple({'color': '#e31a1c', 'width': '0.4'})
+        symbol = QgsLineSymbol.createSimple(
+            {'color': '#e31a1c', 'width': '0.4'})
         output_layer.setRenderer(QgsSingleSymbolRenderer(symbol))
         output_layer.triggerRepaint()
 
@@ -351,35 +348,40 @@ class LayerFactory:
         pr = layer.dataProvider()
 
         pr.addAttributes([
-            _build_field("stop_id", QVariant.String),
-            _build_field("name", QVariant.String),
-            _build_field("location_type", QVariant.String),
-            _build_field("parent_station", QVariant.String),
-            _build_field("stop_code", QVariant.String),
-            _build_field("platform", QVariant.String),
-            _build_field("routes", QVariant.String),
-            _build_field("is_terminal", QVariant.String),
-            _build_field("terminal_routes", QVariant.String),
-            _build_field("stop_desc", QVariant.String),
-            _build_field("lat", QVariant.Double),
-            _build_field("lon", QVariant.Double),
-            _build_field("lines_count", QVariant.Int),
-            _build_field("all_transit_types", QVariant.String),
-            _build_field("most_frequent_type", QVariant.Int)
+            build_field("stop_id", QVariant.String),
+            build_field("name", QVariant.String),
+            build_field("location_type", QVariant.String),
+            build_field("parent_station", QVariant.String),
+            build_field("stop_code", QVariant.String),
+            build_field("platform", QVariant.String),
+            build_field("routes", QVariant.String),
+            build_field("is_terminal", QVariant.String),
+            build_field("terminal_routes", QVariant.String),
+            build_field("stop_desc", QVariant.String),
+            build_field("lat", QVariant.Double),
+            build_field("lon", QVariant.Double),
+            build_field("lines_count", QVariant.Int),
+            build_field("all_transit_types", QVariant.String),
+            build_field("most_frequent_type", QVariant.Int)
         ])
         layer.updateFields()
 
         features = []
         for stop_id, s in stops.items():
             feat = QgsFeature()
-            feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(s['lon'], s['lat'])))
+            feat.setGeometry(
+                QgsGeometry.fromPointXY(
+                    QgsPointXY(
+                        s['lon'],
+                        s['lat'])))
 
             # General routes
             route_ids = stop_to_routes.get(stop_id, [])
             route_names = []
             for rid in route_ids:
                 rinfo = routes.get(rid, {})
-                route_names.append(rinfo.get('short_name') or rinfo.get('long_name') or rid)
+                route_names.append(
+                    rinfo.get('short_name') or rinfo.get('long_name') or rid)
             route_names_str = ", ".join(sorted(list(set(route_names))))
 
             # Terminal routes
@@ -387,7 +389,8 @@ class LayerFactory:
             pf_route_names = []
             for rid in pf_route_ids:
                 rinfo = routes.get(rid, {})
-                pf_route_names.append(rinfo.get('short_name') or rinfo.get('long_name') or rid)
+                pf_route_names.append(
+                    rinfo.get('short_name') or rinfo.get('long_name') or rid)
             pf_route_names_str = ", ".join(sorted(list(set(pf_route_names))))
             is_pf = "yes" if pf_route_names_str else ""
 
@@ -396,12 +399,17 @@ class LayerFactory:
             r_types_list = sorted(list(r_types))
             r_types_str = ", ".join(r_types_list)
 
-            # Primary transit type for icon (priority: Subway > Rail > Tram > Ferry > Bus)
+            # Primary transit type for icon (priority: Subway > Rail > Tram >
+            # Ferry > Bus)
             primary_type = 3  # Default Bus
             if r_types:
                 # Basic GTFS types priority
                 priority = {'1': 1, '2': 2, '0': 10, '4': 20, '3': 30}
-                sorted_by_pri = sorted(list(r_types), key=lambda x: priority.get(x, 100))
+                sorted_by_pri = sorted(
+                    list(r_types),
+                    key=lambda x: priority.get(
+                        x,
+                        100))
                 primary_type = int(sorted_by_pri[0])
 
             feat.setAttributes([
@@ -439,7 +447,8 @@ class LayerFactory:
             symbol.changeSymbolLayer(0, bg_layer)
             # 2. Foreground Emoji
             fg_layer = QgsFontMarkerSymbolLayer()
-            fg_layer.setFontFamily('Arial')  # Avoid system-specific font mapping issues
+            # Avoid system-specific font mapping issues
+            fg_layer.setFontFamily('Arial')
             fg_layer.setCharacter(char)
             fg_layer.setColor(QtGui.QColor(255, 255, 255))
             fg_layer.setSize(2.2)
@@ -452,8 +461,13 @@ class LayerFactory:
         for stop_id, s_types in stop_route_types.items():
             if not s_types:
                 continue
-            priority = {'1': 1, '2': 2, '0': 10, '4': 20, '3': 30, '200': 30}  # Note: 200 grouped with Bus priority
-            sorted_by_pri = sorted(list(s_types), key=lambda x: priority.get(x, 100))
+            priority = {'1': 1, '2': 2, '0': 10, '4': 20, '3': 30,
+                        '200': 30}  # Note: 200 grouped with Bus priority
+            sorted_by_pri = sorted(
+                list(s_types),
+                key=lambda x: priority.get(
+                    x,
+                    100))
             p_type = sorted_by_pri[0]
             # Convert extended to base types for rule matching if needed
             if 100 <= int(p_type) < 200:
@@ -472,10 +486,22 @@ class LayerFactory:
             # (Label, Expression, Color, Emoji, TypeID)
             # (Label, Expression, Color, Emoji, TypeID)
             ('Subway', '"most_frequent_type" = 1', '#FF0000', '🚇', '1'),
-            ('Rail', '("most_frequent_type" = 2 OR ("most_frequent_type" >= 100 AND "most_frequent_type" < 200))', '#FF8C00', '🚄', '100'),
-            ('Tram', '("most_frequent_type" = 0 OR ("most_frequent_type" >= 900 AND "most_frequent_type" < 1000))', '#32CD32', '🚃', '0'),
+            ('Rail',
+             '("most_frequent_type" = 2 OR ("most_frequent_type" >= 100 AND "most_frequent_type" < 200))',
+             '#FF8C00',
+             '🚄',
+             '100'),
+            ('Tram',
+             '("most_frequent_type" = 0 OR ("most_frequent_type" >= 900 AND "most_frequent_type" < 1000))',
+             '#32CD32',
+             '🚃',
+             '0'),
             ('Bus', '("most_frequent_type" = 3 OR ("most_frequent_type" >= 200 AND "most_frequent_type" < 300) OR ("most_frequent_type" >= 700 AND "most_frequent_type" < 900))', '#1E90FF', '🚌', '3'),
-            ('Ferry', '("most_frequent_type" = 4 OR ("most_frequent_type" >= 1000 AND "most_frequent_type" < 1100))', '#00CED1', '⛴️', '4')
+            ('Ferry',
+             '("most_frequent_type" = 4 OR ("most_frequent_type" >= 1000 AND "most_frequent_type" < 1100))',
+             '#00CED1',
+             '⛴️',
+             '4')
         ]
 
         root_rule = QgsRuleBasedRenderer.Rule(None)
@@ -483,11 +509,18 @@ class LayerFactory:
         # Only add rules that are present in the data
         for label, exp, color, char, tid in rules:
             if tid in present_types:
-                rule = QgsRuleBasedRenderer.Rule(create_layered_symbol(color, char), label=label, filterExp=exp)
+                rule = QgsRuleBasedRenderer.Rule(
+                    create_layered_symbol(
+                        color, char), label=label, filterExp=exp)
                 root_rule.appendChild(rule)
 
         # Default rule if nothing matches or others exist
-        default_rule = QgsRuleBasedRenderer.Rule(create_layered_symbol('#808080', '🚏'), label='Other', filterExp='ELSE')
+        default_rule = QgsRuleBasedRenderer.Rule(
+            create_layered_symbol(
+                '#808080',
+                '🚏'),
+            label='Other',
+            filterExp='ELSE')
         root_rule.appendChild(default_rule)
 
         layer.setRenderer(QgsRuleBasedRenderer(root_rule))
@@ -505,7 +538,8 @@ class LayerFactory:
         return layer
 
     @staticmethod
-    def create_walking_reach(stop_layer: QgsVectorLayer) -> Optional[QgsVectorLayer]:
+    def create_walking_reach(
+            stop_layer: QgsVectorLayer) -> Optional[QgsVectorLayer]:
         """Creates a 400m buffer using native:buffer for maximum reliability."""
         if not stop_layer or stop_layer.featureCount() == 0:
             return None
@@ -527,7 +561,8 @@ class LayerFactory:
             reach_layer = result['OUTPUT']
 
             # Styling: Semi-transparent blue
-            symbol = QgsFillSymbol.createSimple({'color': '0,0,255,40', 'outline_color': 'blue'})
+            symbol = QgsFillSymbol.createSimple(
+                {'color': '0,0,255,40', 'outline_color': 'blue'})
             reach_layer.renderer().setSymbol(symbol)
             reach_layer.setOpacity(0.5)
 
@@ -536,10 +571,15 @@ class LayerFactory:
             node = QgsProject.instance().layerTreeRoot().findLayer(reach_layer.id())
             if node:
                 node.setItemVisibilityChecked(False)
-            QgsMessageLog.logMessage("Walking Reach created via native:buffer.", "GTFS Plugin", Qgis.Info)
+            QgsMessageLog.logMessage(
+                "Walking Reach created via native:buffer.",
+                "GTFS Plugin",
+                Qgis.Info)
             return reach_layer
         except Exception as e:
-            QgsMessageLog.logMessage(f"Walking Reach Failed: {str(e)}", "GTFS Plugin", Qgis.Critical)
+            QgsMessageLog.logMessage(
+                f"Walking Reach Failed: {
+                    str(e)}", "GTFS Plugin", Qgis.Critical)
             return None
 
     @staticmethod
@@ -557,7 +597,8 @@ class LayerFactory:
 
         # Ensure CRS compatibility
         if walking_layer.crs() != pop_layer.crs():
-            transform = QgsCoordinateTransform(walking_layer.crs(), pop_layer.crs(), QgsProject.instance())
+            transform = QgsCoordinateTransform(
+                walking_layer.crs(), pop_layer.crs(), QgsProject.instance())
             unified_walking.transform(transform)
 
         if unified_walking.isEmpty():
@@ -571,7 +612,7 @@ class LayerFactory:
         )
         pr = result_layer.dataProvider()
         fields = pop_layer.fields()
-        fields.append(_build_field("pct_covered", QVariant.Double))
+        fields.append(build_field("pct_covered", QVariant.Double))
         pr.addAttributes(fields)
         result_layer.updateFields()
 
@@ -579,7 +620,9 @@ class LayerFactory:
         features_to_add = []
 
         # Map fields (case-insensitive)
-        actual_pop_field = next((f.name() for f in pop_layer.fields() if f.name().lower() == pop_field.lower()), pop_field)
+        actual_pop_field = next(
+            (f.name() for f in pop_layer.fields() if f.name().lower() == pop_field.lower()),
+            pop_field)
 
         for pop_feat in pop_layer.getFeatures():
             geom = pop_feat.geometry()
@@ -616,19 +659,24 @@ class LayerFactory:
 
         # Styling: Light to Dark Purple
         my_range = []
-        symbol = QgsFillSymbol.createSimple({'color': '#f2f0f7', 'outline_color': 'gray'})
+        symbol = QgsFillSymbol.createSimple(
+            {'color': '#f2f0f7', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(0.0, 0.0, symbol, '0%'))
 
-        symbol = QgsFillSymbol.createSimple({'color': '#cbc9e2', 'outline_color': 'gray'})
+        symbol = QgsFillSymbol.createSimple(
+            {'color': '#cbc9e2', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(0.1, 25.0, symbol, '1-25%'))
 
-        symbol = QgsFillSymbol.createSimple({'color': '#9e9ac8', 'outline_color': 'gray'})
+        symbol = QgsFillSymbol.createSimple(
+            {'color': '#9e9ac8', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(25.1, 50.0, symbol, '25-50%'))
 
-        symbol = QgsFillSymbol.createSimple({'color': '#756bb1', 'outline_color': 'gray'})
+        symbol = QgsFillSymbol.createSimple(
+            {'color': '#756bb1', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(50.1, 75.0, symbol, '50-75%'))
 
-        symbol = QgsFillSymbol.createSimple({'color': '#54278f', 'outline_color': 'gray'})
+        symbol = QgsFillSymbol.createSimple(
+            {'color': '#54278f', 'outline_color': 'gray'})
         my_range.append(QgsRendererRange(75.1, 100.0, symbol, '75-100%'))
 
         renderer = QgsGraduatedSymbolRenderer('pct_covered', my_range)
@@ -664,7 +712,8 @@ class LayerFactory:
 
         # Ensure CRS compatibility
         if walking_layer.crs() != pop_layer.crs():
-            transform = QgsCoordinateTransform(walking_layer.crs(), pop_layer.crs(), QgsProject.instance())
+            transform = QgsCoordinateTransform(
+                walking_layer.crs(), pop_layer.crs(), QgsProject.instance())
             unified_walking.transform(transform)
 
         features_to_add = []
@@ -682,7 +731,8 @@ class LayerFactory:
                 if pop_val > 0:
                     features_to_add.append(pop_feat)
             else:
-                # Partial coverage check: if intersection area < 10% of total area
+                # Partial coverage check: if intersection area < 10% of total
+                # area
                 intersection = geom.intersection(unified_walking)
                 if intersection.area() < geom.area() * 0.1:
                     pop_val = 0
@@ -697,7 +747,8 @@ class LayerFactory:
         desert_layer.updateExtents()
 
         # Style: Semi-transparent Red
-        symbol = QgsFillSymbol.createSimple({'color': '255,0,0,100', 'outline_color': 'red'})
+        symbol = QgsFillSymbol.createSimple(
+            {'color': '255,0,0,100', 'outline_color': 'red'})
         desert_layer.renderer().setSymbol(symbol)
 
         QgsProject.instance().addMapLayer(desert_layer)
@@ -707,7 +758,7 @@ class LayerFactory:
     def apply_rt_symbology(layer: QgsVectorLayer):
         """Applies a professional bus icon symbology to the RT layer with rotation."""
         symbol = QgsMarkerSymbol()
-        
+
         # 1. Background Circle (Blue)
         bg_layer = QgsSimpleMarkerSymbolLayer()
         bg_layer.setShape(QgsSimpleMarkerSymbolLayer.Circle)
@@ -716,7 +767,7 @@ class LayerFactory:
         bg_layer.setStrokeWidth(0.5)
         bg_layer.setSize(4)
         symbol.changeSymbolLayer(0, bg_layer)
-        
+
         # 2. Foreground Directional Indicator (White Triangle)
         fg_layer = QgsFontMarkerSymbolLayer()
         fg_layer.setFontFamily('Arial')
@@ -724,17 +775,17 @@ class LayerFactory:
         fg_layer.setColor(QtGui.QColor(255, 255, 255))
         fg_layer.setSize(2.5)
         symbol.appendSymbolLayer(fg_layer)
-        
+
         # Data-defined rotation based on 'bearing'
         symbol.setDataDefinedAngle(QgsProperty.fromField("bearing"))
-        
+
         layer.setRenderer(QgsSingleSymbolRenderer(symbol))
-        
+
         # Labeling
         label_settings = QgsPalLayerSettings()
         label_settings.fieldName = "vehicle_id"
         label_settings.placement = QgsPalLayerSettings.AroundPoint
-        
+
         text_format = QgsTextFormat()
         text_format.setSize(7)
         buffer_settings = QgsTextBufferSettings()
@@ -742,7 +793,7 @@ class LayerFactory:
         buffer_settings.setSize(0.8)
         text_format.setBuffer(buffer_settings)
         label_settings.setFormat(text_format)
-        
+
         layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
         layer.setLabelsEnabled(True)
         layer.triggerRepaint()

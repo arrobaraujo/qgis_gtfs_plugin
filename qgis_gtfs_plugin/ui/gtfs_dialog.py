@@ -16,7 +16,8 @@ class GTFSDialog(QtWidgets.QDialog, FORM_CLASS):
         super(GTFSDialog, self).__init__(parent)
         self.setupUi(self)
 
-        # Initialize the QgsFileWidget in the placeholder 'fileWidget' from the .ui
+        # Initialize the QgsFileWidget in the placeholder 'fileWidget' from the
+        # .ui
         self.gtfs_file_widget = QgsFileWidget(self.fileWidget)
         self.gtfs_file_widget.setFilter("GTFS ZIP (*.zip)")
         self.gtfs_file_widget.setStorageMode(QgsFileWidget.GetFile)

@@ -2,7 +2,7 @@
 
 [English](README.md) | **Português**
 
-[![QGIS Version](https://img.shields.io/badge/QGIS-3.40--4.0-green.svg)](https://qgis.org/) 
+[![QGIS Version](https://img.shields.io/badge/QGIS-3.44--4.0-green.svg)](https://qgis.org/) 
 [![Version](https://img.shields.io/badge/version-1.1.1-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-red.svg)](LICENSE)
 

@@ -3,10 +3,10 @@
 **English** | [Português](README.pt-BR.md)
 
 [![QGIS Version](https://img.shields.io/badge/QGIS-3.40--4.0-green.svg)](https://qgis.org/) 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-red.svg)](LICENSE)
 
-**GTFS 2 GIS - Plugin QGIS (v1.0.0)** is a QGIS plugin designed for visualizing and analyzing public transit networks from GTFS (General Transit Feed Specification) ZIP files.
+**GTFS 2 GIS - Plugin QGIS (v1.1.0)** is a QGIS plugin designed for visualizing and analyzing public transit networks from static GTFS ZIP files and live GTFS-Realtime feeds.
 
 Supported QGIS versions: **3.40 to 4.0**.
 
@@ -21,7 +21,12 @@ Supported QGIS versions: **3.40 to 4.0**.
     - Icons by transit type (🚌 Bus, 🚇 Subway, 🚄 Rail, ⛴️ Ferry).
 - **Financial Data**: Extracts fare prices linked to routes.
 - **Automatic Styling**: Applies official route colors defined in GTFS data.
-- **Analytics Dashboard**: Real-time statistics panel (total km, stop density, fleets, etc.).
+- **Analytics Dashboard**: Statistics panel (total km, stop density, fleets, etc.).
+- **GTFS-Realtime Tracking**: 
+    - Real-time vehicle visualization from binary Protobuf feeds.
+    - Automated dependency handling (pip install protobuf).
+    - Customizable URLs and refresh intervals.
+    - Bearing-based vehicle rotation.
 - **Period Filtering**: Filter lines by time slots (Morning Peak, Midday, Evening Peak, Night).
 
 ---
@@ -60,7 +65,11 @@ Supported QGIS versions: **3.40 to 4.0**.
 1. Go to **Plugins** -> **GTFS 2 GIS** -> **Load GTFS...**.
 2. Select a GTFS `.zip` file.
 3. Lines and stops layers will be created with all metadata.
-4. Use the **GTFS Analytics** panel for advanced filtering and tools.
+4. Open the **GTFS Analytics** panel (`F7` or via Toolbar).
+5. In the **Real-Time Tracking** section:
+    - If needed, click **Install Dependencies** to set up Protobuf in your QGIS environment.
+    - Enter a GTFS-RT URL (e.g., Rio de Janeiro: `http://dados.mobilidade.rio/gtfs/realtime`).
+    - Click **Start Tracking** to load live vehicles onto the map.
 
 ---
 

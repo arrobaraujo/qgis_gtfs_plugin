@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.0] - 2026-04-09
+### Added
+- **GTFS-Realtime Tracking**: Integrate Google Protobuf feeds for live vehicle visualization.
+- **Auto-Refresh**: Live memory layer that updates based on a configurable interval.
+- **Dynamic Symbology**: Realistic vehicle icons that rotate based on the `bearing` field.
+- **Dependency Management**: Automated installation of the `protobuf` library directly from the QGIS interface.
+- **Feed Customization**: Allow users to define custom GTFS-RT URLs directly in the QGIS dashboard.
+- **Performance**: Lazy loading of RT components for better plugin stability.
+
 ## [1.0.0] - 2026-04-01
 - First stable `1.0.0` release.
 - Updated plugin metadata version to `1.0.0`.

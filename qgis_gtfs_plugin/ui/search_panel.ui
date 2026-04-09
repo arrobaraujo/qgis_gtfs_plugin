@@ -237,6 +237,95 @@
      </widget>
     </item>
     <item>
+     <widget class="QGroupBox" name="groupBox_rt">
+      <property name="title">
+       <string>GTFS-Real Time Tracker</string>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_rt">
+       <item>
+        <widget class="QPushButton" name="btn_install_deps">
+         <property name="text">
+          <string>Install Required Dependencies</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: #ffcc00; font-weight: bold;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lbl_rt_status">
+         <property name="text">
+          <string>Status: Inactive</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font-weight: bold; color: gray;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="verticalLayout_url">
+         <item>
+          <widget class="QLabel" name="label_url">
+           <property name="text">
+            <string>Feed URL (Protobuf):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="txt_rt_url">
+           <property name="text">
+            <string>http://dados.mobilidade.rio/gtfs/realtime</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_rt_btns">
+         <item>
+          <widget class="QPushButton" name="btn_start_rt">
+           <property name="text">
+            <string>Start</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_stop_rt">
+           <property name="text">
+            <string>Stop</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_interval">
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Interval (s):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spin_rt_interval">
+           <property name="minimum">
+            <number>10</number>
+           </property>
+           <property name="maximum">
+            <number>300</number>
+           </property>
+           <property name="value">
+            <number>30</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
      <spacer name="verticalSpacer_main">
       <property name="orientation">
        <enum>Qt::Vertical</enum>

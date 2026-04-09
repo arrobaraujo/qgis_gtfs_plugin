@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import os
+# Force pure-Python implementation to avoid "Descriptors cannot be created directly" error in newer protobuf versions
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
 from typing import Dict, Any
 from qgis.PyQt import uic, QtWidgets, QtCore
 from qgis.core import QgsProject, QgsMapLayerProxyModel
 from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox
+from qgis.gui import QgsMapLayerComboBox, QgsFieldComboBox
+# from .rt_manager import RTManager  <-- Moved to lazy import
 
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
     os.path.dirname(__file__), '..', 'ui', 'search_panel.ui'))
@@ -23,6 +28,15 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
 
         self.btn_frequency_heatmap.clicked.connect(self.run_frequency_heatmap)
         self.btn_real_isochrones.clicked.connect(self.run_real_isochrones)
+
+        # Real-time Tracker
+        self.rt_manager = None
+        self.btn_start_rt.clicked.connect(self.start_rt_tracking)
+        self.btn_stop_rt.clicked.connect(self.stop_rt_tracking)
+        self.btn_install_deps.clicked.connect(self.install_dependencies)
+
+        # Check dependencies on startup
+        self.check_rt_dependencies()
 
     @staticmethod
     def _exec_dialog(dialog: QtWidgets.QDialog) -> int:
@@ -279,3 +293,112 @@ class GTFSSearchPanel(QtWidgets.QDockWidget, FORM_CLASS):
                 layer.setSubsetString('')
 
         self.iface.mapCanvas().refresh()
+
+    def start_rt_tracking(self):
+        """Initializes and starts the real-time tracker."""
+        # Lazy import to prevent startup crash if protobuf is missing
+        try:
+            from .rt_manager import RTManager
+            from .rt_processor import HAS_PROTOBUF
+        except ImportError:
+            HAS_PROTOBUF = False
+
+        if not HAS_PROTOBUF:
+            self.install_dependencies()
+            return
+
+        url = self.txt_rt_url.text().strip()
+        if not url:
+            QtWidgets.QMessageBox.warning(self, "Error", "Please enter a valid GTFS-RT URL.")
+            return
+
+        interval = self.spin_rt_interval.value()
+        
+        if not self.rt_manager:
+            # Re-import here to ensure it's in scope if HAS_PROTOBUF is True
+            from .rt_manager import RTManager
+            self.rt_manager = RTManager(self.iface, url, interval)
+            self.rt_manager.status_changed.connect(self.update_rt_status)
+            
+        self.rt_manager.interval = interval
+        self.rt_manager.start()
+        
+        self.btn_start_rt.setEnabled(False)
+        self.btn_stop_rt.setEnabled(True)
+        self.lbl_rt_status.setStyleSheet("font-weight: bold; color: green;")
+
+    def stop_rt_tracking(self):
+        """Stops the real-time tracker."""
+        if self.rt_manager:
+            self.rt_manager.stop()
+            
+        self.btn_start_rt.setEnabled(True)
+        self.btn_stop_rt.setEnabled(False)
+        self.lbl_rt_status.setStyleSheet("font-weight: bold; color: gray;")
+
+    def update_rt_status(self, message: str):
+        """Callback from RTManager to update the UI status label."""
+        self.lbl_rt_status.setText(f"Status: {message}")
+
+    def check_rt_dependencies(self):
+        """Hides the install button if protobuf is already present."""
+        try:
+            from .rt_processor import HAS_PROTOBUF
+        except ImportError:
+            HAS_PROTOBUF = False
+        
+        self.btn_install_deps.setVisible(not HAS_PROTOBUF)
+
+    def install_dependencies(self):
+        """Attempts to install protobuf using pip within the QGIS environment."""
+        self.lbl_rt_status.setText("Status: Installing dependencies...")
+        self.lbl_rt_status.setStyleSheet("font-weight: bold; color: blue;")
+        QtWidgets.QApplication.processEvents()
+        
+        try:
+            import sys
+            import os
+            import subprocess
+            
+            # 1. Identify the correct Python executable
+            # If sys.executable is the QGIS binary (e.g., qgis-bin.exe), it will try to open args as layers.
+            # We must find the companion python.exe.
+            py_exe = sys.executable
+            if "qgis" in os.path.basename(py_exe).lower():
+                bin_dir = os.path.dirname(py_exe)
+                # Candidates for OSGeo4W / Windows installs
+                for candidate in ["python3.exe", "python.exe", "pythonw.exe"]:
+                    path = os.path.join(bin_dir, candidate)
+                    if os.path.exists(path):
+                        py_exe = path
+                        break
+            
+            # 2. Run installation
+            # Using CREATE_NO_WINDOW (0x08000000) on Windows to keep it silent
+            creation_flags = 0
+            if os.name == 'nt':
+                creation_flags = 0x08000000
+
+            subprocess.check_call(
+                [py_exe, "-m", "pip", "install", "protobuf"],
+                creationflags=creation_flags
+            )
+            
+            QtWidgets.QMessageBox.information(
+                self, "Success", 
+                "Dependencies installed successfully!\n"
+                "Please restart QGIS to apply changes correctly."
+            )
+            self.check_rt_dependencies()
+            self.lbl_rt_status.setText("Status: Restart Required")
+            self.lbl_rt_status.setStyleSheet("font-weight: bold; color: orange;")
+            
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(
+                self, "Installation Failed", 
+                f"Failed to install 'protobuf' using {py_exe}\n\n"
+                f"Error: {str(e)}\n\n"
+                "Please try manual installation via 'OSGeo4W Shell' if available."
+            )
+            self.lbl_rt_status.setText("Status: Install Failed")
+            self.lbl_rt_status.setStyleSheet("font-weight: bold; color: red;")

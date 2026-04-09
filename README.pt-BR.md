@@ -1,12 +1,12 @@
-# GTFS 2 GIS - Plugin QGIS (v1.0.0)
+# GTFS 2 GIS - Plugin QGIS (v1.1.0)
 
 [English](README.md) | **Português**
 
 [![QGIS Version](https://img.shields.io/badge/QGIS-3.40--4.0-green.svg)](https://qgis.org/) 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://plugins.qgis.org/plugins/qgis_gtfs_plugin/)
 [![License](https://img.shields.io/badge/License-GPL%20v3-red.svg)](LICENSE)
 
-O **GTFS 2 GIS** é um plugin para QGIS desenvolvido para visualização e análise de redes de transporte público a partir de arquivos GTFS (General Transit Feed Specification).
+O **GTFS 2 GIS** é um plugin para QGIS desenvolvido para visualização e análise de redes de transporte público a partir de arquivos GTFS estáticos e feeds dinâmicos de GTFS-Realtime.
 
 Versões suportadas do QGIS: **3.40 até 4.0**.
 
@@ -21,7 +21,12 @@ Versões suportadas do QGIS: **3.40 até 4.0**.
     - Ícones por tipo de transporte (🚌 Ônibus, 🚇 Metrô, 🚄 Trem, ⛴️ Barca).
 - **Dados Financeiros**: Extrai preços de tarifas vinculados às rotas.
 - **Estilização Automática**: Aplica as cores oficiais das rotas definidas nos dados GTFS.
-- **Painel de Analytics**: Dashboard em tempo real com estatísticas (km totais, densidade de pontos, frotas, etc.).
+- **Painel de Analytics**: Dashboard com estatísticas (km totais, densidade de pontos, frotas, etc.).
+- **Rastreamento GTFS-Realtime**: 
+    - Visualização de veículos em tempo real a partir de feeds Protobuf.
+    - Instalação automática de dependências (pip install protobuf).
+    - URLs e intervalos de atualização customizáveis.
+    - Rotação de ícones baseada no rumo (bearing) do veículo.
 - **Filtro por Período**: Filtre linhas por horários (Pico Manhã, Entrepico, Pico Tarde, Noite).
 
 ---
@@ -60,7 +65,11 @@ Versões suportadas do QGIS: **3.40 até 4.0**.
 1. Vá em **Plugins** -> **GTFS 2 GIS** -> **Load GTFS...**.
 2. Selecione um arquivo `.zip` de GTFS.
 3. As camadas de linhas e pontos serão criadas com todos os metadados.
-4. Use o painel **GTFS Analytics** para filtros e ferramentas avançadas.
+4. Abra o painel **GTFS Analytics** (`F7` ou pela Barra de Ferramentas).
+5. Na seção **Real-Time Tracking**:
+    - Se necessário, clique em **Install Dependencies** para configurar o Protobuf.
+    - Insira a URL do feed GTFS-RT (ex: Rio: `http://dados.mobilidade.rio/gtfs/realtime`).
+    - Clique em **Start Tracking** para visualizar os veículos no mapa.
 
 ---
 

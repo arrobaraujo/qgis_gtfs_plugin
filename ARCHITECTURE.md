@@ -20,7 +20,11 @@ qgis_gtfs_plugin/            ← Plugin root (installed in QGIS plugins dir)
 │   ├── __init__.py
 │   ├── processor.py         ← GTFSProcessor — GTFS parsing engine
 │   ├── layer_factory.py     ← LayerFactory — Layer creation & styling
-│   └── search_panel.py      ← GTFSSearchPanel — Dashboard & analysis tools
+│   ├── search_panel.py      ← GTFSSearchPanel — Dashboard & analysis tools
+│   ├── rt_manager.py        ← RTManager — Real-time tracking lifecycle (Singleton)
+│   ├── rt_processor.py      ← GTFSRTProcessor — GTFS-RT Protobuf parsing
+│   └── vendor/              ← Third-party bindings
+│       └── gtfs_realtime_pb2.py ← GTFS-RT Protobuf message definitions
 └── ui/                      ← User interface definitions
     ├── __init__.py
     ├── gtfs_dialog.py        ← GTFSDialog — File selection dialog
@@ -46,6 +50,8 @@ graph TB
             PROC["processor.py<br/>GTFSProcessor"]
             LF["layer_factory.py<br/>LayerFactory"]
             SP["search_panel.py<br/>GTFSSearchPanel"]
+            RTM["rt_manager.py<br/>RTManager"]
+            RTP["rt_processor.py<br/>GTFSRTProcessor"]
         end
 
         subgraph UI["ui/"]
@@ -67,6 +73,10 @@ graph TB
         FR["fare_rules.txt"]
     end
 
+    subgraph RT_Feed["GTFS-Realtime"]
+        PB["Protobuf Feed<br/>(URL)"]
+    end
+
     IFACE --> INIT --> LOADER
     LOADER --> DLG
     LOADER --> PROC
@@ -75,8 +85,12 @@ graph TB
     DLG -.-> DLG_UI
     SP -.-> SP_UI
     PROC --> Data
+    RTP --> RT_Feed
+    RTM --> RTP
+    SP --> RTM
     LF --> IFACE
     SP --> LF
+    RTM --> LF
 ```
 
 ---
@@ -182,8 +196,24 @@ A `QDockWidget` that provides:
   - Population Coverage Analysis (requires census layer)
   - Transit Desert Finder (requires census layer)
   - Network Isochrones (requires road layer)
+  - **GTFS-Realtime Control Panel**: Start/Stop tracking, URL config, refresh rate selection, and dependency installer.
 
-### 6. `ui/` — User Interface
+### 6. `core/rt_manager.py` — RTManager (Singleton)
+
+Manages the lifecycle of the real-time tracking session.
+
+- **State Management**: Tracks if a session is active.
+- **QTimer**: Handles the periodic refresh calls to the feed.
+- **Layer Persistence**: Maintains a reference to the `GTFS-Realtime` memory layer to update it in-place instead of recreating it.
+
+### 7. `core/rt_processor.py` — GTFSRTProcessor
+
+Handles the downloading and parsing of binary GTFS-RT feeds.
+
+- **Cross-Version Compatibility**: Explicitly sets `PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python` to ensure vendored descriptors work across different Protobuf library versions (3.x to 5.x) commonly found in QGIS environments.
+- **Protobuf Parsing**: Decodes the feed into `FeedMessage` objects.
+
+### 8. `ui/` — User Interface
 
 - **`gtfs_dialog.py`** + **`gtfs_dialog.ui`**: File selection dialog using `QgsFileWidget` for GTFS ZIP selection and service day combo box (All/Weekday/Saturday/Sunday)
 - **`search_panel.ui`**: Qt Designer layout for the analytics dock panel with filter controls, stats labels, and analysis buttons
@@ -253,3 +283,8 @@ flowchart LR
 5. **Frequency-Based Rendering**: Lines are rendered with data-defined width (`scale_linear`) and ordered by frequency (thicker/more frequent lines drawn underneath), providing a natural visual hierarchy.
 
 6. **Service Day Filtering**: Applied at parse time in `_parse_trips()` using `calendar.txt` data, reducing memory usage for filtered views.
+
+7. **Protobuf Compatibility Strategy**: To avoid the common "Descriptors cannot be created directly" or "TypeError: Couldn't parse file" errors in diverse QGIS environments (Windows, Linux, Mac), the plugin:
+    - Vendors a structural-only `gtfs_realtime_pb2.py`.
+    - Forces the Pure-Python implementation of `protobuf` before importing.
+    - Defines descriptors manually to remain agnostic of the installed library version.

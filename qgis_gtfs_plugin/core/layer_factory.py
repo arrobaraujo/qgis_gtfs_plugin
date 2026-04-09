@@ -702,3 +702,46 @@ class LayerFactory:
 
         QgsProject.instance().addMapLayer(desert_layer)
         return desert_layer
+
+    @staticmethod
+    def apply_rt_symbology(layer: QgsVectorLayer):
+        """Applies a professional bus icon symbology to the RT layer with rotation."""
+        symbol = QgsMarkerSymbol()
+        
+        # 1. Background Circle (Blue)
+        bg_layer = QgsSimpleMarkerSymbolLayer()
+        bg_layer.setShape(QgsSimpleMarkerSymbolLayer.Circle)
+        bg_layer.setColor(QtGui.QColor("#1E90FF"))
+        bg_layer.setStrokeColor(QtGui.QColor(255, 255, 255))
+        bg_layer.setStrokeWidth(0.5)
+        bg_layer.setSize(4)
+        symbol.changeSymbolLayer(0, bg_layer)
+        
+        # 2. Foreground Bus Icon (White)
+        fg_layer = QgsFontMarkerSymbolLayer()
+        fg_layer.setCharacter('🚌')
+        fg_layer.setColor(QtGui.QColor(255, 255, 255))
+        fg_layer.setSize(3)
+        symbol.appendSymbolLayer(fg_layer)
+        
+        # Data-defined rotation based on 'bearing'
+        symbol.setDataDefinedAngle(QgsProperty.fromField("bearing"))
+        
+        layer.setRenderer(QgsSingleSymbolRenderer(symbol))
+        
+        # Labeling
+        label_settings = QgsPalLayerSettings()
+        label_settings.fieldName = "vehicle_id"
+        label_settings.placement = QgsPalLayerSettings.AroundPoint
+        
+        text_format = QgsTextFormat()
+        text_format.setSize(7)
+        buffer_settings = QgsTextBufferSettings()
+        buffer_settings.setEnabled(True)
+        buffer_settings.setSize(0.8)
+        text_format.setBuffer(buffer_settings)
+        label_settings.setFormat(text_format)
+        
+        layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
+        layer.setLabelsEnabled(True)
+        layer.triggerRepaint()

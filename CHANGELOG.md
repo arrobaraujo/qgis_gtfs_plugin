@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.5] - 2026-04-10
+### Fixed
+- **Code Quality**: Fixed Flake8 issues (E302 and W504) for full CI compliance.
+
 ## [1.1.4] - 2026-04-10
 ### Added
 - **Authentication**: Updated the release workflow to use token-based authentication (Bearer JWT) for the official QGIS Repository.

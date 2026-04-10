@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.6] - 2026-04-10
+### Fixed
+- **Code Quality**: Refactored statistics calculation to satisfy contradictory Flake8 line break rules.
+
 ## [1.1.5] - 2026-04-10
 ### Fixed
 - **Code Quality**: Fixed Flake8 issues (E302 and W504) for full CI compliance.

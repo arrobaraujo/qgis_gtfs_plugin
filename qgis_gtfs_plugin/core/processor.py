@@ -254,8 +254,9 @@ class GTFSProcessor:
                     self.stop_to_pf_routes[sid].add(rid)
 
     def get_stats(self) -> Dict[str, Any]:
-        total_km = sum(self.shape_lengths.get(sid, 0)
-                       * freq for sid, freq in self.shape_frequencies.items())
+        total_km = 0
+        for sid, freq in self.shape_frequencies.items():
+            total_km += self.shape_lengths.get(sid, 0) * freq
         agency_trips = {}
         agencies_found = set()
         for trip in self.trips:
